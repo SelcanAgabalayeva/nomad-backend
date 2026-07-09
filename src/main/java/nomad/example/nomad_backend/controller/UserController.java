@@ -2,6 +2,7 @@ package nomad.example.nomad_backend.controller;
 
 import jakarta.validation.Valid;
 import nomad.example.nomad_backend.dto.GoogleProfileCompleteRequest;
+import nomad.example.nomad_backend.dto.UserLoginRequest;
 import nomad.example.nomad_backend.dto.UserRegisterRequest;
 import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.service.UserService;
@@ -29,5 +30,12 @@ public class UserController {
     public ResponseEntity<User> completeGoogleProfile(@Valid @RequestBody GoogleProfileCompleteRequest request) {
         User updatedUser = userService.completeGoogleProfile(request);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    // Bunu da UserController daxilinə əlavə et:
+    @PostMapping("/login")
+    public ResponseEntity<User> loginUser(@Valid @RequestBody UserLoginRequest request) {
+        User loggedInUser = userService.loginUser(request);
+        return ResponseEntity.ok(loggedInUser);
     }
 }

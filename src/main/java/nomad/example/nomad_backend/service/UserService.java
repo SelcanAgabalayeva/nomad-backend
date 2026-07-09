@@ -1,6 +1,7 @@
 package nomad.example.nomad_backend.service;
 
 import nomad.example.nomad_backend.dto.GoogleProfileCompleteRequest;
+import nomad.example.nomad_backend.dto.UserLoginRequest;
 import nomad.example.nomad_backend.dto.UserRegisterRequest;
 import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.repository.UserRepository;
@@ -51,5 +52,21 @@ public class UserService {
         }
 
         return userRepository.save(user);
+    }
+
+    // Bunu UserService klasının daxilinə, ən aşağı hissəyə əlavə et:
+    public User loginUser(UserLoginRequest request) {
+        // 1. Bazada bu e-mail-də istifadəçi varammı?
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("ERROR_INVALID_CREDENTIALS"));
+
+        // 2. Şifrə düzgündürmü?
+        // Qeyd: Gələcəkdə şifrələr BCrypt ilə yoxlanacaq, hələlik sadə bərabərliyə baxırıq
+        if (!user.getPassword().equals(request.getPassword())) {
+            throw new RuntimeException("ERROR_INVALID_CREDENTIALS");
+        }
+
+        // Hər şey düzdürsə istifadəçi obyektini qaytarırıq
+        return user;
     }
 }

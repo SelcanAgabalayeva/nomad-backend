@@ -29,13 +29,7 @@ public class ProjectService {
         return projectRepository.findByStatus(ProjectStatus.APPLIED);
     }
 
-    public List<UserProject> getUpcomingDeadlines() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime upcoming = now.plusDays(7);
-        return projectRepository.findUpcomingDeadlines(now, upcoming);
-    }
-
-    public List<UserProject> getProjectsByInterests(List<String> categories) {
+    public List<UserProject> getRecommendedProjects(List<String> categories) {
         return projectRepository.findByCategoryIn(categories);
     }
 

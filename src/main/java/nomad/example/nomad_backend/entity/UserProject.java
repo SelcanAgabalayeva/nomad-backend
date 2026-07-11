@@ -18,19 +18,19 @@ public class UserProject {
     private Long id;
 
     private String title;
-
+    private String description;
     private String category;
-
     private LocalDateTime deadline;
 
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 
-    private Boolean emailNotificationsEnabled = true;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
+    private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

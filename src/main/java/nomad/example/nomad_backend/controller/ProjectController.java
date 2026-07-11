@@ -24,9 +24,14 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getSavedProjects());
     }
 
-    @GetMapping("/upcoming")
-    public ResponseEntity<List<UserProject>> getUpcomingDeadlines() {
-        return ResponseEntity.ok(projectService.getUpcomingDeadlines());
+    @GetMapping("/applied")
+    public ResponseEntity<List<UserProject>> getAppliedProjects() {
+        return ResponseEntity.ok(projectService.getAppliedProjects());
+    }
+
+    @GetMapping("/recommended")
+    public ResponseEntity<List<UserProject>> getRecommendedProjects(@RequestParam List<String> categories) {
+        return ResponseEntity.ok(projectService.getRecommendedProjects(categories));
     }
 
     @PutMapping("/{id}/status")

@@ -1,13 +1,22 @@
 package nomad.example.nomad_backend.entity;
-
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import nomad.example.nomad_backend.enums.EducationLevel;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(
+        name = "users",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "username"),
+                @UniqueConstraint(columnNames = "email")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,18 +37,33 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String password;
 
+    private String password;
+    @Column(unique = true)
     private String phoneNumber;
 
     private LocalDate birthDate;
 
     private String university;
 
-    private String educationLevel;
-
     private String major;
 
+    @Enumerated(EnumType.STRING)
+    private EducationLevel educationLevel;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_interests")
+    @Column(name = "interest")
+    private Set<String> interests = new HashSet<>();
+
+    private boolean termsAccepted;
+    @OneToMany(mappedBy = "user")
+    private List<UserProject> projects;
+    private boolean newsletter;
     @Column(nullable = false)
-    private Boolean isSubscribedToEmails = false;
+    private String provider;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
+
 }

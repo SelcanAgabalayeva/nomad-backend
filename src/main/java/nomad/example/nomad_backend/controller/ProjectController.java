@@ -1,0 +1,43 @@
+package nomad.example.nomad_backend.controller;
+
+import nomad.example.nomad_backend.entity.UserProject;
+import nomad.example.nomad_backend.entity.ProjectStatus;
+import nomad.example.nomad_backend.service.ProjectService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/projects")
+@CrossOrigin(origins = "*")
+public class ProjectController {
+
+    private final ProjectService projectService;
+
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
+    }
+
+    @GetMapping("/saved")
+    public ResponseEntity<List<UserProject>> getSavedProjects() {
+        return ResponseEntity.ok(projectService.getSavedProjects());
+    }
+
+    @GetMapping("/applied")
+    public ResponseEntity<List<UserProject>> getAppliedProjects() {
+        return ResponseEntity.ok(projectService.getAppliedProjects());
+    }
+
+    @GetMapping("/recommended")
+    public ResponseEntity<List<UserProject>> getRecommendedProjects(@RequestParam List<String> categories) {
+        return ResponseEntity.ok(projectService.getRecommendedProjects(categories));
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<UserProject> updateStatus(
+            @PathVariable Long id,
+            @RequestParam ProjectStatus status) {
+        return ResponseEntity.ok(projectService.updateProjectStatus(id, status));
+    }
+}

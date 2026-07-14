@@ -45,7 +45,12 @@ public class SecurityConfig {
                                 "/api/auth/refresh-token",
                                 "/api/auth/logout",
                                 "/oauth2/**",
-                                "/login/**"
+                                "/login/**",
+                                "/api/opportunities",
+                                "/api/v1/test-email",
+                                "/api/opportunities/cards",
+                                "/api/contact/**",
+                                "/api/v1/projects/**"
                         )
                         .permitAll()
 

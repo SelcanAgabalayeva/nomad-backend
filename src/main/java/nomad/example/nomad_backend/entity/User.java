@@ -6,6 +6,7 @@ import nomad.example.nomad_backend.enums.EducationLevel;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -56,7 +57,8 @@ public class User {
     private Set<String> interests = new HashSet<>();
 
     private boolean termsAccepted;
-
+    @OneToMany(mappedBy = "user")
+    private List<UserProject> projects;
     private boolean newsletter;
     @Column(nullable = false)
     private String provider;

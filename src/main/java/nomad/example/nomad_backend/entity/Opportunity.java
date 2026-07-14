@@ -3,6 +3,8 @@ package nomad.example.nomad_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "opportunities")
 @Getter
@@ -18,7 +20,7 @@ public class Opportunity {
 
     private String title;
 
-    private String deadline;
+    private LocalDate deadline;
 
     private String type;
 
@@ -29,7 +31,14 @@ public class Opportunity {
 
     @Column(length = 2000)
     private String sumEn;
+    @Column(length = 2000)
+    private String sumRus;
 
+    private String sort;
+    private String country;
+    private String applyLink;
+    @Column(name = "opening_date")
+    private LocalDate openingDate;
     @Column(unique = true)
-    private String uniqueKey; // duplicate control üçün
+    private String uniqueKey;
 }

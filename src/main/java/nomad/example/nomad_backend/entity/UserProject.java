@@ -16,12 +16,12 @@ public class UserProject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String title;
-    private String description;
-    private String category;
-    private LocalDateTime deadline;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "opportunity_id")
+    private Opportunity opportunity;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
     @Enumerated(EnumType.STRING)
     private ProjectStatus status;
 

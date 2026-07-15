@@ -46,10 +46,13 @@ public class SecurityConfig {
                                 "/api/auth/logout",
                                 "/oauth2/**",
                                 "/login/**",
+                                "/api/v1/wishlist/**",
+
                                 "/api/opportunities",
                                 "/api/v1/test-email",
                                 "/api/opportunities/cards",
                                 "/api/contact/**",
+
                                 "/api/v1/projects/**"
                         )
                         .permitAll()

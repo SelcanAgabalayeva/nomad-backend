@@ -78,7 +78,6 @@ public class OAuth2SuccessHandler
                             newUser.setEmail(email);
 
 
-                            // Google user üçün müvəqqəti dəyərlər
                             newUser.setPassword("GOOGLE_USER");
 
                             newUser.setPhoneNumber(

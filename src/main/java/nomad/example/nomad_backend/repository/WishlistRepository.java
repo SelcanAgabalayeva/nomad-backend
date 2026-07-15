@@ -8,7 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
-    // Long -> Integer etdik
     List<Wishlist> findByUserId(Integer userId);
     Optional<Wishlist> findByUserIdAndProjectId(Integer userId, Long projectId);
     void deleteByUserIdAndProjectId(Integer userId, Long projectId);

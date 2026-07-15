@@ -31,5 +31,5 @@ public class Opportunity {
     private String sumEn;
 
     @Column(unique = true)
-    private String uniqueKey; // duplicate control üçün
+    private String uniqueKey;
 }

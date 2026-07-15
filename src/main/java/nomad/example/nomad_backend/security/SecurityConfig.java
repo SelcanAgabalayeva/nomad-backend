@@ -45,7 +45,9 @@ public class SecurityConfig {
                                 "/api/auth/refresh-token",
                                 "/api/auth/logout",
                                 "/oauth2/**",
-                                "/login/**"
+                                "/login/**",
+                                "/api/v1/wishlist/**",
+                                "/api/v1/projects/**"
                         )
                         .permitAll()
 

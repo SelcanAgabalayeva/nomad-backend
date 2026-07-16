@@ -67,8 +67,15 @@ public class OpportunitySyncService {
             DateTimeFormatter formatter =
                     DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-            LocalDate deadlineDate =
-                    LocalDate.parse(deadline, formatter);
+            LocalDate deadlineDate = null;
+
+            if (deadline != null) {
+                deadline = deadline.trim();
+
+                if (deadline.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
+                    deadlineDate = LocalDate.parse(deadline, formatter);
+                }
+            }
 
 
             opportunity.setTitle(title);
@@ -85,8 +92,16 @@ public class OpportunitySyncService {
             opportunity.setCountry(country);
             opportunity.setApplyLink(applyLink);
 
-            LocalDate openingDateValue =
-                    LocalDate.parse(openingDate, formatter);
+            LocalDate openingDateValue = null;
+
+            if (openingDate != null) {
+                openingDate = openingDate.trim();
+
+                if (openingDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
+                    openingDateValue = LocalDate.parse(openingDate, formatter);
+                }
+            }
+
             opportunity.setOpeningDate(openingDateValue);
 
 

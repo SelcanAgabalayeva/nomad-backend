@@ -3,6 +3,7 @@ package nomad.example.nomad_backend.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
+import nomad.example.nomad_backend.entity.Role;
 
 import java.time.LocalDateTime;
 
@@ -10,12 +11,16 @@ import java.time.LocalDateTime;
 @Setter
 public class UserResponseDto {
 
-    private Integer id;
+    private Long id;
 
-    private String username;
+    private String firstName;
+
+    private String lastName;
 
     private String email;
 
-    private LocalDateTime createdAt;
+    private String phoneNumber;
+
+    private Role role;
 }
 

@@ -3,6 +3,7 @@ package nomad.example.nomad_backend.service.impls;
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.*;
 import nomad.example.nomad_backend.entity.RefreshToken;
+import nomad.example.nomad_backend.entity.Role;
 import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.exception.ConflictException;
 import nomad.example.nomad_backend.exception.ForbiddenException;
@@ -62,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
                 .termsAccepted(request.isTermsAccepted())
                 .newsletter(request.isNewsletter())
                 .provider("LOCAL")
+                .role(Role.USER)
                 .build();
 
         userRepository.save(user);
@@ -104,7 +106,10 @@ public class AuthServiceImpl implements AuthService {
                 jwtService.generateToken(user);
 
 
-        return new LoginResponseDto(token);
+        return LoginResponseDto.builder()
+                .token(token)
+                .role(user.getRole().name())
+                .build();
 
     }
 

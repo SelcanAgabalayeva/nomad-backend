@@ -4,6 +4,7 @@ import nomad.example.nomad_backend.entity.UserProject;
 import nomad.example.nomad_backend.entity.ProjectStatus;
 import nomad.example.nomad_backend.service.ProjectService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,22 +19,22 @@ public class ProjectController {
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
-
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/saved")
     public ResponseEntity<List<UserProject>> getSavedProjects() {
         return ResponseEntity.ok(projectService.getSavedProjects());
     }
-
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/applied")
     public ResponseEntity<List<UserProject>> getAppliedProjects() {
         return ResponseEntity.ok(projectService.getAppliedProjects());
     }
-
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/recommended")
     public ResponseEntity<List<UserProject>> getRecommendedProjects(@RequestParam List<String> categories) {
         return ResponseEntity.ok(projectService.getRecommendedProjects(categories));
     }
-
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}/status")
     public ResponseEntity<UserProject> updateStatus(
             @PathVariable Long id,

@@ -3,6 +3,7 @@ package nomad.example.nomad_backend.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -11,11 +12,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
     private final OAuth2SuccessHandler oauth2SuccessHandler;
 
 
@@ -26,9 +26,7 @@ public class SecurityConfig {
 
 
         return http
-
                 .csrf(csrf -> csrf.disable())
-
 
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
@@ -36,32 +34,36 @@ public class SecurityConfig {
                         )
                 )
 
-
                 .authorizeHttpRequests(auth -> auth
 
+                        // Public endpointlər
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
-                                "/api/auth/refresh-token",
-                                "/api/auth/logout",
-                                "/oauth2/**",
-                                "/login/**",
-                                "/api/v1/wishlist/**",
-
-                                "/api/opportunities",
-                                "/api/v1/test-email",
-                                "/api/opportunities/cards",
                                 "/api/contact/**",
+                                "/oauth2/**",
+                                "/login/**"
+                        ).permitAll()
 
-                                "/api/v1/projects/**"
-                        )
-                        .permitAll()
 
-
+                        // USER + ADMIN
                         .requestMatchers(
-                                "/api/auth/me"
-                        )
-                        .authenticated()
+                                "/api/auth/me",
+                                "/api/v1/projects/**",
+                                "/api/v1/wishlist/**"
+                        ).hasAnyRole("USER", "ADMIN")
+
+
+                        // Hamı baxa bilər
+                        .requestMatchers(
+                                "/api/opportunities/**"
+                        ).permitAll()
+
+
+                        // ADMIN
+                        .requestMatchers(
+                                "/api/admin/**"
+                        ).hasRole("ADMIN")
 
 
                         .anyRequest()
@@ -70,8 +72,7 @@ public class SecurityConfig {
 
 
                 .oauth2Login(oauth ->
-                        oauth
-                                .successHandler(oauth2SuccessHandler)
+                        oauth.successHandler(oauth2SuccessHandler)
                 )
 
 
@@ -79,7 +80,6 @@ public class SecurityConfig {
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
-
 
                 .build();
     }

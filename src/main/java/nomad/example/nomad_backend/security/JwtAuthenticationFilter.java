@@ -10,12 +10,15 @@ import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.repository.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -65,11 +68,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     jwtService.isTokenValid(token,user)) {
 
 
+                List<GrantedAuthority> authorities = List.of(
+                        new SimpleGrantedAuthority("ROLE_" + user.getRole().name())
+                );
+
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 user,
                                 null,
-                                Collections.emptyList()
+                                authorities
                         );
 
 

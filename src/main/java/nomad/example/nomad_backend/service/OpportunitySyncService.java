@@ -7,6 +7,8 @@ import nomad.example.nomad_backend.repository.OpportunityRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -19,16 +21,41 @@ public class OpportunitySyncService {
     @Scheduled(fixedRate = 60000)
     public void sync() throws Exception {
 
-        List<List<Object>> rows = googleSheetsService.read("Sheet1!A2:F");
+        System.out.println("SYNC STARTED");
+
+        List<List<Object>> rows = googleSheetsService.read("Sheet1!A2:L100");
+
+        System.out.println("ROW COUNT: " + rows.size());
 
         for (List<Object> row : rows) {
 
-            String title = row.get(0).toString();
-            String deadline = row.get(1).toString();
-            String type = row.get(2).toString();
-            String category = row.get(3).toString();
-            String sumAz = row.get(4).toString();
-            String sumEn = row.get(5).toString();
+            System.out.println("ROW DATA: " + row);
+            System.out.println("ROW SIZE: " + row.size());
+
+            if(row.size() < 12) {
+                System.out.println("SKIPPED: " + row.size());
+                continue;
+            }
+
+            String ss = row.get(0).toString();
+
+            String title = row.get(1).toString();
+
+            String deadline = row.get(2).toString();
+
+            String type = row.get(3).toString();
+
+            String category = row.get(4).toString();
+
+            String sumAz = row.get(5).toString();
+
+            String sumEn = row.get(6).toString();
+            String sumRus = row.get(7).toString();
+            String sort = row.get(8).toString();
+            String country = row.get(9).toString();
+
+            String applyLink = row.get(10).toString();
+            String openingDate = row.get(11).toString();
 
             String uniqueKey = title + "_" + deadline;
 
@@ -36,13 +63,32 @@ public class OpportunitySyncService {
                     .findByUniqueKey(uniqueKey)
                     .orElse(new Opportunity());
 
+
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+            LocalDate deadlineDate =
+                    LocalDate.parse(deadline, formatter);
+
+
             opportunity.setTitle(title);
-            opportunity.setDeadline(deadline);
+            opportunity.setDeadline(deadlineDate);
             opportunity.setType(type);
             opportunity.setCategory(category);
             opportunity.setSumAz(sumAz);
             opportunity.setSumEn(sumEn);
+            opportunity.setSumRus(sumRus);
+            opportunity.setSort(sort);
+            opportunity.setCountry(country);
+            opportunity.setApplyLink(applyLink);
             opportunity.setUniqueKey(uniqueKey);
+            opportunity.setCountry(country);
+            opportunity.setApplyLink(applyLink);
+
+            LocalDate openingDateValue =
+                    LocalDate.parse(openingDate, formatter);
+            opportunity.setOpeningDate(openingDateValue);
+
 
             opportunityRepository.save(opportunity);
         }

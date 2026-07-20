@@ -19,10 +19,9 @@ public class ProjectController {
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @GetMapping("/saved")
-    public ResponseEntity<List<UserProject>> getSavedProjects() {
-        return ResponseEntity.ok(projectService.getSavedProjects());
+    @PostMapping("/{id}/save")
+    public ResponseEntity<UserProject> saveProject(@PathVariable Long id) {
+        return ResponseEntity.ok(projectService.updateProjectStatus(id, ProjectStatus.SAVED));
     }
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/applied")

@@ -1,0 +1,33 @@
+[33m23251cf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m prepare project for deployment
+[33mb2a9c02[m prepare project for deployment
+[33m1cdeb94[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge branch 'develop'
+[33m453178d[m Merge pull request #8 from SelcanAgabalayeva/feature/project-management
+[33m661ce98[m Merge branch 'develop' into feature/project-management
+[33mb886703[m fix: SecurityConfig merge conflict resolved successfully
+[33mce9fe2c[m Deyisiklik
+[33m6f7b239[m Deyisiklik
+[33m4d906ab[m Add README documentation
+[33m84c932b[m Add product security  endpoints
+[33m478df81[m feat: contact endpoint permitted in security config
+[33md1bf1f2[m feat: contact message controller and entity added
+[33m728f4b0[m Son hal
+[33m2e5fe1d[m feat: implement personalized wishlist system
+[33mbfe2189[m feat: implement saved, applied, recommended projects and multi-language status system
+[33m81beebe[m Add authentication module
+[33m986e1c9[m[33m ([m[1;31morigin/develop[m[33m)[m Merge pull request #7 from SelcanAgabalayeva/feature/role
+[33m159e0d5[m[33m ([m[1;31morigin/feature/role[m[33m)[m Add product security  endpoints
+[33m0d99d18[m Merge pull request #6 from SelcanAgabalayeva/feature/project-management
+[33m1d7d684[m[33m ([m[1;31morigin/feature/project-management[m[33m)[m feat: contact endpoint permitted in security config
+[33m0f3ee90[m fix: resolved security config conflicts with develop branch
+[33m6b64767[m Son hal
+[33m76009d0[m feat: implement personalized wishlist system
+[33m98d0d33[m Merge pull request #4 from SelcanAgabalayeva/feature/email
+[33m50df95f[m[33m ([m[1;31morigin/feature/email[m[33m)[m feat: contact message controller and entity added
+[33mfac9946[m Merge pull request #3 from SelcanAgabalayeva/feature/project-management
+[33m991436f[m feat: implement saved, applied, recommended projects and multi-language status system
+[33m61f50cb[m Merge pull request #2 from SelcanAgabalayeva/feature/auth
+[33ma660609[m[33m ([m[1;31morigin/feature/auth[m[33m)[m Add authentication module
+[33m85f91ba[m Merge pull request #1 from SelcanAgabalayeva/feature/user-registration
+[33m15485dd[m feat: add UserProject entity, repository, service and multi-language controller endpoints
+[33m3761292[m feat: implement user registration and google profile completion endpoints
+[33mb359a24[m Clean initial commit without secrets

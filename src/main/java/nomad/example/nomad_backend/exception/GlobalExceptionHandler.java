@@ -83,4 +83,17 @@ public class GlobalExceptionHandler {
                                 .build()
                 );
     }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponseDto> handleGenericRuntimeException(
+            RuntimeException ex
+    ) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ErrorResponseDto.builder()
+                                .status(400)
+                                .message(ex.getMessage())
+                                .build()
+                );
+    }
 }

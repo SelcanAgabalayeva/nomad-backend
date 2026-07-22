@@ -1,5 +1,9 @@
 package nomad.example.nomad_backend.service.impls;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.*;
 import nomad.example.nomad_backend.entity.RefreshToken;
@@ -13,15 +17,20 @@ import nomad.example.nomad_backend.repository.UserRepository;
 import nomad.example.nomad_backend.security.JwtService;
 import nomad.example.nomad_backend.service.AuthService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Base64;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +42,27 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final JwtService jwtService;
+
+
+    @Value("${google.client-id}")
+    private String googleClientId;
+
+
+    private void saveRefreshToken(User user, String refreshToken) {
+        RefreshToken entity = RefreshToken.builder()
+                .user(user)
+                .token(refreshToken)
+                .expiresAt(
+                        jwtService.extractExpiration(refreshToken)
+                                .toInstant()
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDateTime()
+                )
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        refreshTokenRepository.save(entity);
+    }
 
     @Override
     public AuthResponseDto register(RegisterRequestDto request) {
@@ -72,6 +102,8 @@ public class AuthServiceImpl implements AuthService {
 
         String refreshToken = jwtService.generateRefreshToken(user);
 
+        saveRefreshToken(user, refreshToken);
+
         return AuthResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -106,11 +138,68 @@ public class AuthServiceImpl implements AuthService {
                 jwtService.generateToken(user);
 
 
+        String refreshToken = jwtService.generateRefreshToken(user);
+        saveRefreshToken(user, refreshToken);
+
         return LoginResponseDto.builder()
                 .token(token)
                 .role(user.getRole().name())
+                .refreshToken(refreshToken)
                 .build();
 
+    }
+
+    @Override
+    public LoginResponseDto loginWithGoogle(GoogleLoginRequestDto request) {
+
+        GoogleIdToken.Payload payload = verifyGoogleToken(request.getIdToken());
+
+        String email = payload.getEmail();
+        String firstName = (String) payload.get("given_name");
+        String lastName = (String) payload.get("family_name");
+
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .firstName(firstName != null ? firstName : "")
+                            .lastName(lastName != null ? lastName : "")
+                            .email(email)
+                            .password(null)
+                            .provider("GOOGLE")
+                            .role(Role.USER)
+                            .termsAccepted(true)
+                            .newsletter(false)
+                            .build();
+                    return userRepository.save(newUser);
+                });
+
+        String token = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        saveRefreshToken(user, refreshToken);
+
+        return LoginResponseDto.builder()
+                .token(token)
+                .role(user.getRole().name())
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    private GoogleIdToken.Payload verifyGoogleToken(String idTokenString) {
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    new NetHttpTransport(), GsonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken == null) {
+                throw new UnauthorizedException("Google token etibarsızdır.");
+            }
+            return idToken.getPayload();
+
+        } catch (GeneralSecurityException | IOException e) {
+            throw new UnauthorizedException("Google token yoxlanılarkən xəta baş verdi.");
+        }
     }
 
 

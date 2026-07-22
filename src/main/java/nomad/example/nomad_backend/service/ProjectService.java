@@ -4,10 +4,12 @@ import nomad.example.nomad_backend.dtos.OpportunityCardResponse;
 import nomad.example.nomad_backend.dtos.OpportunityDetailResponse;
 import nomad.example.nomad_backend.dtos.PlatformStatsResponse;
 import nomad.example.nomad_backend.entity.Opportunity;
+import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.entity.UserProject;
 import nomad.example.nomad_backend.entity.ProjectStatus;
 import nomad.example.nomad_backend.repository.OpportunityRepository;
 import nomad.example.nomad_backend.repository.ProjectRepository;
+import nomad.example.nomad_backend.repository.UserRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,12 +29,15 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final MessageSource messageSource;
     private final OpportunityRepository opportunityRepository;
+    private final UserRepository userRepository;
 
 
-    public ProjectService(ProjectRepository projectRepository, MessageSource messageSource, OpportunityRepository opportunityRepository) {
+    public ProjectService(ProjectRepository projectRepository, MessageSource messageSource,
+                          OpportunityRepository opportunityRepository, UserRepository userRepository) {
         this.projectRepository = projectRepository;
         this.messageSource = messageSource;
         this.opportunityRepository = opportunityRepository;
+        this.userRepository = userRepository;
     }
 
     public List<UserProject> getSavedProjects() {
@@ -46,6 +52,14 @@ public class ProjectService {
         return projectRepository.findByOpportunity_CategoryIn(categories);
     }
 
+    // YENİ: konkret istifadəçinin BÜTÜN UserProject sətirlərini qaytarır
+    // (wishlist-dəki getUserWishlist ilə eyni məntiq). Frontend-in
+    // ApplicationStatusContext-i tətbiq açılanda BİR DƏFƏ bunu çağırıb
+    // status-ları yaddaşda saxlayır.
+    public List<UserProject> getUserProjects(Long userId) {
+        return new ArrayList<>(projectRepository.findByUserId(userId));
+    }
+
     public UserProject updateProjectStatus(Long projectId, ProjectStatus newStatus) {
         UserProject project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException(
@@ -56,6 +70,35 @@ public class ProjectService {
         project.setUpdatedAt(LocalDateTime.now());
         return projectRepository.save(project);
     }
+
+    // YENİ: WishlistService.addToWishlist ilə EYNİ "tap-ya-yarat" məntiqi.
+    // Frontend yalnız opportunityId bilir (UserProject-in öz id-sini yox),
+    // ona görə əvvəlcə (userId, opportunityId) cütü ilə axtarılır, sətir
+    // yoxdursa yeni yaradılır, sonra status təyin olunur. Bu, "Status seç"
+    // dropdown-unun HƏR statusu (preparing/applied/accepted/rejected)
+    // birbaşa, wishlist-dən asılı olmadan işlətməsinə imkan verir.
+    public UserProject setProjectStatus(Integer userId, Long opportunityId, ProjectStatus status) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Opportunity opportunity = opportunityRepository.findById(opportunityId)
+                .orElseThrow(() -> new RuntimeException(
+                        messageSource.getMessage("project.not.found", null, LocaleContextHolder.getLocale())
+                ));
+
+        UserProject project = projectRepository.findByUser_IdAndOpportunity_Id(userId, opportunityId)
+                .orElseGet(() -> {
+                    UserProject newProject = new UserProject();
+                    newProject.setUser(user);
+                    newProject.setOpportunity(opportunity);
+                    return newProject;
+                });
+
+        project.setStatus(status);
+        project.setUpdatedAt(LocalDateTime.now());
+        return projectRepository.save(project);
+    }
+
     public List<OpportunityCardResponse> getAllOpportunitiesForCards(Long userId) {
 
         List<Opportunity> opportunities = opportunityRepository.findAll();

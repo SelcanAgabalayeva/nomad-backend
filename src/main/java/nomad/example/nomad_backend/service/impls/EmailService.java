@@ -42,7 +42,7 @@ public class EmailService {
         contactMessageRepository.save(contactMessage); // Bazaya yadda saxlanılır
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("your-receiver-email@example.com");
+        message.setTo("nomadyouth26@gmail.com");
 
         String subject = (request.getSubject() != null && !request.getSubject().trim().isEmpty())
                 ? request.getSubject()

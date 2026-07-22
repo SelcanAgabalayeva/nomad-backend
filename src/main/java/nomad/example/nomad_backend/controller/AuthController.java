@@ -61,5 +61,11 @@ public class AuthController {
         );
 
     }
-}
 
+    @PostMapping("/google")
+    public ResponseEntity<LoginResponseDto> loginWithGoogle(
+            @Valid @RequestBody GoogleLoginRequestDto request) {
+
+        return ResponseEntity.ok(authService.loginWithGoogle(request));
+    }
+}

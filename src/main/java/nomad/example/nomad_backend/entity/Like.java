@@ -8,11 +8,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "wishlists")
+@Table(name = "likes")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Wishlist {
+public class Like {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

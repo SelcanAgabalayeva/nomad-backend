@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<UserProject, Long> {
@@ -14,4 +15,6 @@ public interface ProjectRepository extends JpaRepository<UserProject, Long> {
     List<UserProject> findByOpportunity_CategoryIn(List<String> categories);
 
     Collection<UserProject> findByUserId(Long userId);
+
+    Optional<UserProject> findByUser_IdAndOpportunity_Id(Integer userId, Long opportunityId);
 }

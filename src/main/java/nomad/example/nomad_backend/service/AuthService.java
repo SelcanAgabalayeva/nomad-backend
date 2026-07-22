@@ -6,6 +6,7 @@ import nomad.example.nomad_backend.dtos.*;
 public interface AuthService {
     AuthResponseDto register(RegisterRequestDto request);
     LoginResponseDto login(LoginRequestDto request);
+    LoginResponseDto loginWithGoogle(GoogleLoginRequestDto request);
 
     void logout(RefreshTokenRequestDto request);
 

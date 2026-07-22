@@ -91,7 +91,8 @@ public class SecurityConfig {
         // TODO: Prod-a çıxanda buraya "https://nomadyouth.az" da əlavə et.
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "http://127.0.0.1:5173"
+                "http://127.0.0.1:5173",
+                "https://nomad-youth-platform.vercel.app"
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

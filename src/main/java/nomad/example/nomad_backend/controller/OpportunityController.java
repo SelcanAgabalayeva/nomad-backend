@@ -7,6 +7,9 @@ import nomad.example.nomad_backend.dtos.PlatformStatsResponse;
 import nomad.example.nomad_backend.entity.Opportunity;
 import nomad.example.nomad_backend.repository.OpportunityRepository;
 import nomad.example.nomad_backend.service.ProjectService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +27,14 @@ public class OpportunityController {
     @GetMapping
     public List<Opportunity> getAll() {
         return repository.findAll();
+    }
+    @GetMapping("/paged")
+    public Page<Opportunity> getAllPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "6") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return repository.findAll(pageable);
     }
     @GetMapping("/{id}/details")
     public ResponseEntity<OpportunityDetailResponse> getDetails(

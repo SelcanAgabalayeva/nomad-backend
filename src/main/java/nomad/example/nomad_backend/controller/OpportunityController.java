@@ -31,7 +31,7 @@ public class OpportunityController {
     @GetMapping("/paged")
     public Page<Opportunity> getAllPaged(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "6") int size
+            @RequestParam(defaultValue = "15") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return repository.findAll(pageable);

@@ -17,7 +17,11 @@ public class OpportunitySyncService {
 
     private final GoogleSheetsService googleSheetsService;
     private final OpportunityRepository opportunityRepository;
-
+    private String cell(List<Object> row, int index) {
+        return index < row.size()
+                ? row.get(index).toString().trim()
+                : "";
+    }
     @Scheduled(fixedRate = 60000)
     public void sync() throws Exception {
 
@@ -32,30 +36,34 @@ public class OpportunitySyncService {
             System.out.println("ROW DATA: " + row);
             System.out.println("ROW SIZE: " + row.size());
 
-            if(row.size() < 12) {
-                System.out.println("SKIPPED: " + row.size());
+            if (cell(row, 1).isBlank()) {
+                System.out.println("SKIPPED EMPTY ROW");
                 continue;
             }
 
-            String ss = row.get(0).toString();
+            String ss = cell(row, 0);
 
-            String title = row.get(1).toString();
+            String title = cell(row, 1);
 
-            String deadline = row.get(2).toString();
+            String deadline = cell(row, 2);
 
-            String type = row.get(3).toString();
+            String type = cell(row, 3);
 
-            String category = row.get(4).toString();
+            String category = cell(row, 4);
 
-            String sumAz = row.get(5).toString();
+            String sumAz = cell(row, 5);
 
-            String sumEn = row.get(6).toString();
-            String sumRus = row.get(7).toString();
-            String sort = row.get(8).toString();
-            String country = row.get(9).toString();
+            String sumEn = cell(row, 6);
 
-            String applyLink = row.get(10).toString();
-            String openingDate = row.get(11).toString();
+            String sumRus = cell(row, 7);
+
+            String sort = cell(row, 8);
+
+            String country = cell(row, 9);
+
+            String applyLink = cell(row, 10);
+
+            String openingDate = cell(row, 11);
 
             String uniqueKey = title + "_" + deadline;
 
@@ -69,12 +77,10 @@ public class OpportunitySyncService {
 
             LocalDate deadlineDate = null;
 
-            if (deadline != null) {
-                deadline = deadline.trim();
+            if (!deadline.isBlank() &&
+                    deadline.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
 
-                if (deadline.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
-                    deadlineDate = LocalDate.parse(deadline, formatter);
-                }
+                deadlineDate = LocalDate.parse(deadline, formatter);
             }
 
 
@@ -94,17 +100,19 @@ public class OpportunitySyncService {
 
             LocalDate openingDateValue = null;
 
-            if (openingDate != null) {
-                openingDate = openingDate.trim();
+            if (!openingDate.isBlank() &&
+                    openingDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
 
-                if (openingDate.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
-                    openingDateValue = LocalDate.parse(openingDate, formatter);
-                }
+                openingDateValue = LocalDate.parse(openingDate, formatter);
             }
 
             opportunity.setOpeningDate(openingDateValue);
 
-
+            System.out.println("----------------------------");
+            System.out.println("TITLE: " + title);
+            System.out.println("DEADLINE: " + deadline);
+            System.out.println("UNIQUE KEY: " + uniqueKey);
+            System.out.println("----------------------------");
             opportunityRepository.save(opportunity);
         }
     }

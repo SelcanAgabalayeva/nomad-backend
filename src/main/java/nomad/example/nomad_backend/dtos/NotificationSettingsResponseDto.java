@@ -1,12 +1,13 @@
 package nomad.example.nomad_backend.dtos;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
+
 public class NotificationSettingsResponseDto {
 
 

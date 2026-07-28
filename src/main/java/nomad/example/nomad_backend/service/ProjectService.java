@@ -31,7 +31,6 @@ public class ProjectService {
     private final OpportunityRepository opportunityRepository;
     private final UserRepository userRepository;
 
-
     public ProjectService(ProjectRepository projectRepository, MessageSource messageSource,
                           OpportunityRepository opportunityRepository, UserRepository userRepository) {
         this.projectRepository = projectRepository;
@@ -52,10 +51,6 @@ public class ProjectService {
         return projectRepository.findByOpportunity_CategoryIn(categories);
     }
 
-    // YENİ: konkret istifadəçinin BÜTÜN UserProject sətirlərini qaytarır
-    // (wishlist-dəki getUserWishlist ilə eyni məntiq). Frontend-in
-    // ApplicationStatusContext-i tətbiq açılanda BİR DƏFƏ bunu çağırıb
-    // status-ları yaddaşda saxlayır.
     public List<UserProject> getUserProjects(Long userId) {
         return new ArrayList<>(projectRepository.findByUserId(userId));
     }
@@ -71,12 +66,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    // YENİ: WishlistService.addToWishlist ilə EYNİ "tap-ya-yarat" məntiqi.
-    // Frontend yalnız opportunityId bilir (UserProject-in öz id-sini yox),
-    // ona görə əvvəlcə (userId, opportunityId) cütü ilə axtarılır, sətir
-    // yoxdursa yeni yaradılır, sonra status təyin olunur. Bu, "Status seç"
-    // dropdown-unun HƏR statusu (preparing/applied/accepted/rejected)
-    // birbaşa, wishlist-dən asılı olmadan işlətməsinə imkan verir.
+
     public UserProject setProjectStatus(Integer userId, Long opportunityId, ProjectStatus status) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -109,14 +99,13 @@ public class ProjectService {
                     .collect(Collectors.toMap(
                             up -> up.getOpportunity().getId(),
                             UserProject::getStatus,
-                            (existing, replacement) -> existing // Əgər eyni ID ilə birdən çox status varsa birini saxla
+                            (existing, replacement) -> existing
                     ));
         }
 
         Map<Long, ProjectStatus> finalMap = userProjectStatusMap;
 
         return opportunities.stream().map(opp -> {
-            // Son tarixə qalan gün sayını hesabla
             long daysLeft = 0;
             if (opp.getDeadline() != null) {
                 daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), opp.getDeadline());
@@ -142,6 +131,7 @@ public class ProjectService {
                     .build();
         }).collect(Collectors.toList());
     }
+
     public OpportunityDetailResponse getOpportunityDetails(Long opportunityId, Long userId, String lang) {
 
         Opportunity opp = opportunityRepository.findById(opportunityId)
@@ -184,6 +174,7 @@ public class ProjectService {
                 .isApplied(isApplied)
                 .build();
     }
+
     public PlatformStatsResponse getPlatformStatistics() {
         long activeCount = opportunityRepository.countByDeadlineGreaterThanEqual(LocalDate.now());
         long categoriesCount = opportunityRepository.countDistinctCategories();

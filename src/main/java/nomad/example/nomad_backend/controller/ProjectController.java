@@ -19,29 +19,25 @@ public class ProjectController {
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
+
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/saved")
     public ResponseEntity<List<UserProject>> getSavedProjects() {
         return ResponseEntity.ok(projectService.getSavedProjects());
     }
+
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/applied")
     public ResponseEntity<List<UserProject>> getAppliedProjects() {
         return ResponseEntity.ok(projectService.getAppliedProjects());
     }
+
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/recommended")
     public ResponseEntity<List<UserProject>> getRecommendedProjects(@RequestParam List<String> categories) {
         return ResponseEntity.ok(projectService.getRecommendedProjects(categories));
     }
 
-    // YENİ: konkret istifadəçinin BÜTÜN UserProject sətirlərini (bütün
-    // statuslar - SAVED/PREPARING/APPLIED/ACCEPTED/REJECTED) qaytarır.
-    // Frontend-in ApplicationStatusContext-i tətbiq açılanda BİR DƏFƏ
-    // bunu çağırır. NOT: yuxarıdakı /saved və /applied endpoint-ləri
-    // hazırda istifadəçiyə görə FİLTRLƏNMİR (bütün istifadəçilərin
-    // məlumatını qarışdırır) - bu, ayrıca diqqət tələb edən mövcud bir
-    // məsələdir, bu dəyişikliklə əlaqəli deyil.
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/mine")
     public ResponseEntity<List<UserProject>> getMyProjects(@RequestParam Long userId) {
@@ -52,7 +48,7 @@ public class ProjectController {
     @PutMapping("/{id}/status")
     public ResponseEntity<UserProject> updateStatus(
             @PathVariable Long id,
-            @RequestParam ProjectStatus status) {
+            @RequestParam(required = false) ProjectStatus status) {
         return ResponseEntity.ok(projectService.updateProjectStatus(id, status));
     }
 
@@ -61,7 +57,7 @@ public class ProjectController {
     public ResponseEntity<UserProject> setStatus(
             @RequestParam Integer userId,
             @RequestParam Long opportunityId,
-            @RequestParam ProjectStatus status) {
+            @RequestParam(required = false) ProjectStatus status) {
         return ResponseEntity.ok(projectService.setProjectStatus(userId, opportunityId, status));
     }
 }

@@ -315,31 +315,27 @@ public class AuthServiceImpl implements AuthService {
         }
 
 
-        EmailVerificationToken verificationToken =
+        EmailVerificationToken token =
                 emailVerificationTokenRepository
                         .findByUserEmail(email)
-                        .orElseGet(() -> {
+                        .orElse(new EmailVerificationToken());
 
-                            EmailVerificationToken newToken =
-                                    EmailVerificationToken.builder()
-                                            .user(user)
-                                            .token(UUID.randomUUID().toString())
-                                            .expiryDate(
-                                                    LocalDateTime.now()
-                                                            .plusHours(24)
-                                            )
-                                            .build();
 
-                            return emailVerificationTokenRepository.save(newToken);
-                        });
+        token.setUser(user);
+        token.setToken(UUID.randomUUID().toString());
+        token.setExpiryDate(
+                LocalDateTime.now().plusHours(24)
+        );
+
+
+        emailVerificationTokenRepository.save(token);
 
 
         emailService.sendVerificationEmail(
                 user.getEmail(),
-                verificationToken.getToken()
+                token.getToken()
         );
     }
-
     private void createEmailVerificationToken(User user){
 
         String token =

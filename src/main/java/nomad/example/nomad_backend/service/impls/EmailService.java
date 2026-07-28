@@ -57,4 +57,29 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    public void sendVerificationEmail(String email, String token) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(email);
+
+        message.setSubject(
+                "E-mail təsdiqi"
+        );
+
+        String verificationLink =
+                "http://localhost:8080/api/auth/verify-email?token="
+                        + token;
+
+
+        message.setText(
+                "Salam!\n\n" +
+                        "Hesabınızı aktivləşdirmək üçün aşağıdakı linkə daxil olun:\n\n" +
+                        verificationLink +
+                        "\n\nBu link 24 saat ərzində keçərlidir."
+        );
+
+
+        mailSender.send(message);
+    }
 }

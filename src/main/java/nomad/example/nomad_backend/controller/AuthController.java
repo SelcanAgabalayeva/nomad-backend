@@ -68,4 +68,34 @@ public class AuthController {
 
         return ResponseEntity.ok(authService.loginWithGoogle(request));
     }
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(
+            @RequestParam String token
+    ){
+
+        authService.verifyEmail(token);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "success", true,
+                        "message", "Email uğurla təsdiqləndi."
+                )
+        );
+    }
+
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<?> resendVerification(
+            @RequestParam String email
+    ){
+
+        authService.resendVerificationEmail(email);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "success", true,
+                        "message", "Təsdiq linki yenidən göndərildi."
+                )
+        );
+    }
 }

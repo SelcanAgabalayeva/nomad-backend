@@ -11,4 +11,7 @@ public interface AuthService {
     void logout(RefreshTokenRequestDto request);
 
     UserResponseDto me();
+    void verifyEmail(String token);
+
+    void resendVerificationEmail(String email);
 }

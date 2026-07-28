@@ -6,12 +6,14 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.*;
+import nomad.example.nomad_backend.entity.EmailVerificationToken;
 import nomad.example.nomad_backend.entity.RefreshToken;
 import nomad.example.nomad_backend.entity.Role;
 import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.exception.ConflictException;
 import nomad.example.nomad_backend.exception.ForbiddenException;
 import nomad.example.nomad_backend.exception.UnauthorizedException;
+import nomad.example.nomad_backend.repository.EmailVerificationTokenRepository;
 import nomad.example.nomad_backend.repository.RefreshTokenRepository;
 import nomad.example.nomad_backend.repository.UserRepository;
 import nomad.example.nomad_backend.security.JwtService;
@@ -31,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +45,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final JwtService jwtService;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+    private final EmailService emailService;
 
 
     @Value("${google.client-id}")
@@ -93,10 +98,12 @@ public class AuthServiceImpl implements AuthService {
                 .termsAccepted(request.isTermsAccepted())
                 .newsletter(request.isNewsletter())
                 .provider("LOCAL")
+                .emailVerified(false)
                 .role(Role.USER)
                 .build();
 
         userRepository.save(user);
+        createEmailVerificationToken(user);
 
         String accessToken = jwtService.generateToken(user);
 
@@ -107,7 +114,11 @@ public class AuthServiceImpl implements AuthService {
         return AuthResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .message("Qeydiyyat uğurla tamamlandı.")
+                .message(
+                        "Qeydiyyat uğurla tamamlandı. " +
+                                "E-mail ünvanınızı təsdiqləyin. " +
+                                "Təsdiq linki e-mailinizə göndərilib."
+                )
                 .build();
     }
 
@@ -164,6 +175,7 @@ public class AuthServiceImpl implements AuthService {
                             .firstName(firstName != null ? firstName : "")
                             .lastName(lastName != null ? lastName : "")
                             .email(email)
+                            .emailVerified(true)
                             .password(null)
                             .provider("GOOGLE")
                             .role(Role.USER)
@@ -239,5 +251,108 @@ public class AuthServiceImpl implements AuthService {
         return Base64.getUrlEncoder()
                 .withoutPadding()
                 .encodeToString(bytes);
+    }
+    @Override
+    @Transactional
+    public void verifyEmail(String token){
+
+        EmailVerificationToken verificationToken =
+                emailVerificationTokenRepository
+                        .findByToken(token)
+                        .orElseThrow(
+                                () -> new RuntimeException(
+                                        "Token tapılmadı"
+                                )
+                        );
+
+
+        if(verificationToken.getExpiryDate()
+                .isBefore(LocalDateTime.now())){
+
+            throw new RuntimeException(
+                    "Token müddəti bitib"
+            );
+        }
+
+
+        User user = verificationToken.getUser();
+
+        user.setEmailVerified(true);
+
+        userRepository.save(user);
+
+
+        emailVerificationTokenRepository.delete(
+                verificationToken
+        );
+    }
+    @Override
+    @Transactional
+    public void resendVerificationEmail(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("İstifadəçi tapılmadı")
+                );
+
+
+        if(user.isEmailVerified()){
+            throw new RuntimeException(
+                    "Email artıq təsdiqlənib"
+            );
+        }
+
+
+        EmailVerificationToken verificationToken =
+                emailVerificationTokenRepository
+                        .findByUserEmail(email)
+                        .orElseGet(() -> {
+
+                            EmailVerificationToken newToken =
+                                    EmailVerificationToken.builder()
+                                            .user(user)
+                                            .token(UUID.randomUUID().toString())
+                                            .expiryDate(
+                                                    LocalDateTime.now()
+                                                            .plusHours(24)
+                                            )
+                                            .build();
+
+                            return emailVerificationTokenRepository.save(newToken);
+                        });
+
+
+        emailService.sendVerificationEmail(
+                user.getEmail(),
+                verificationToken.getToken()
+        );
+    }
+
+    private void createEmailVerificationToken(User user){
+
+        String token =
+                UUID.randomUUID().toString();
+
+
+        EmailVerificationToken verificationToken =
+                EmailVerificationToken.builder()
+                        .token(token)
+                        .user(user)
+                        .expiryDate(
+                                LocalDateTime.now()
+                                        .plusHours(24)
+                        )
+                        .build();
+
+
+        emailVerificationTokenRepository.save(
+                verificationToken
+        );
+
+
+        emailService.sendVerificationEmail(
+                user.getEmail(),
+                token
+        );
     }
 }

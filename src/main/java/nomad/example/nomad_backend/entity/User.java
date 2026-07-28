@@ -65,6 +65,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;
+    @Column(nullable = false)
+    private boolean emailVerified = false;
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
 
 }
 

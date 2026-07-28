@@ -23,5 +23,6 @@ public class UserResponseDto {
 
     private Role role;
     private String profileImageUrl;
+    private boolean emailVerified;
 }
 

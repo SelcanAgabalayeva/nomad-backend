@@ -1,11 +1,12 @@
 package nomad.example.nomad_backend.listener;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nomad.example.nomad_backend.entity.Opportunity;
 import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.event.OpportunityCreatedEvent;
+import nomad.example.nomad_backend.repository.NotificationSettingsRepository;
 import nomad.example.nomad_backend.repository.WishlistRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -18,23 +19,31 @@ import java.util.List;
 public class OpportunityNotificationListener {
 
     private final WishlistRepository wishlistRepository;
+    private final NotificationSettingsRepository notificationSettingsRepository;
 
     @Async
     @EventListener
     public void handleOpportunityCreatedEvent(OpportunityCreatedEvent event) {
-        Opportunity newOpportunity = event.getOpportunity();
+        Opportunity opportunity = event.getOpportunity();
 
-        log.info("Yeni layihə yaradıldı: {}. Uyğun istifadəçilər axtarılır...", newOpportunity.getTitle());
+        log.info("Yeni fürsət yaradıldı: {}. Uyğun istifadəçilər axtarılır...", opportunity.getTitle());
 
-        List<User> targetUsers = wishlistRepository.findUsersWithMatchingPreferences(
-                newOpportunity.getCountry(),
-                newOpportunity.getType(),
-                newOpportunity.getCategory()
+        List<User> matchingUsers = wishlistRepository.findUsersWithMatchingPreferences(
+                opportunity.getCountry(),
+                opportunity.getType(),
+                opportunity.getCategory()
         );
 
-        for (User user : targetUsers) {
-            log.info("Bildiriş göndərilir -> İstifadəçi ID: {}, Layihə: {}", user.getId(), newOpportunity.getTitle());
-            // Burada notification service çağırılacaq
+        for (User user : matchingUsers) {
+            notificationSettingsRepository.findByUserId(user.getId()).ifPresent(settings -> {
+
+                if (settings.isNewOpportunities()) {
+
+                    log.info("İstifadəçiyə sayt içi bildiriş yaradılır: UserId = {}, Opportunity = {}",
+                            user.getId(), opportunity.getTitle());
+
+                }
+            });
         }
     }
 }

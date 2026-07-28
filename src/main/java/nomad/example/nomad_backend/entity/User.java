@@ -69,6 +69,9 @@ public class User {
     private boolean emailVerified = false;
     @Column(name = "profile_image_url")
     private String profileImageUrl;
+    @OneToOne(mappedBy = "user",
+            cascade = CascadeType.ALL)
+    private NotificationSettings notificationSettings;
 
 }
 

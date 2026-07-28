@@ -6,14 +6,12 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.*;
-import nomad.example.nomad_backend.entity.EmailVerificationToken;
-import nomad.example.nomad_backend.entity.RefreshToken;
-import nomad.example.nomad_backend.entity.Role;
-import nomad.example.nomad_backend.entity.User;
+import nomad.example.nomad_backend.entity.*;
 import nomad.example.nomad_backend.exception.ConflictException;
 import nomad.example.nomad_backend.exception.ForbiddenException;
 import nomad.example.nomad_backend.exception.UnauthorizedException;
 import nomad.example.nomad_backend.repository.EmailVerificationTokenRepository;
+import nomad.example.nomad_backend.repository.NotificationSettingsRepository;
 import nomad.example.nomad_backend.repository.RefreshTokenRepository;
 import nomad.example.nomad_backend.repository.UserRepository;
 import nomad.example.nomad_backend.security.JwtService;
@@ -47,6 +45,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
     private final EmailService emailService;
+    private final NotificationSettingsRepository notificationSettingsRepository;
 
 
     @Value("${google.client-id}")
@@ -103,6 +102,19 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
+        NotificationSettings settings =
+                NotificationSettings.builder()
+                        .user(user)
+                        .emailNotifications(true)
+                        .inAppNotifications(true)
+                        .newOpportunities(true)
+                        .deadlineReminders(true)
+                        .savedProjectChanges(true)
+                        .platformUpdates(true)
+                        .build();
+
+
+        notificationSettingsRepository.save(settings);
         createEmailVerificationToken(user);
 
         String accessToken = jwtService.generateToken(user);

@@ -82,4 +82,23 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    public void sendInterestNotification(String email, String title) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(email);
+
+        message.setSubject(
+                "Maraq dairənizə uyğun yeni layihə"
+        );
+
+        message.setText(
+                "Salam!\n\n" +
+                        "Maraq dairənizə uyğun yeni layihə əlavə edildi:\n\n" +
+                        title +
+                        "\n\nPlatformaya daxil olaraq ətraflı baxa bilərsiniz."
+        );
+
+        mailSender.send(message);
+    }
 }

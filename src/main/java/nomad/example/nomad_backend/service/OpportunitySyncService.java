@@ -17,6 +17,7 @@ public class OpportunitySyncService {
 
     private final GoogleSheetsService googleSheetsService;
     private final OpportunityRepository opportunityRepository;
+    private final NotificationService notificationService;
     private String cell(List<Object> row, int index) {
         return index < row.size()
                 ? row.get(index).toString().trim()
@@ -67,6 +68,10 @@ public class OpportunitySyncService {
 
             String uniqueKey = title + "_" + deadline;
 
+            boolean isNew = opportunityRepository
+                    .findByUniqueKey(uniqueKey)
+                    .isEmpty();
+
             Opportunity opportunity = opportunityRepository
                     .findByUniqueKey(uniqueKey)
                     .orElse(new Opportunity());
@@ -113,7 +118,13 @@ public class OpportunitySyncService {
             System.out.println("DEADLINE: " + deadline);
             System.out.println("UNIQUE KEY: " + uniqueKey);
             System.out.println("----------------------------");
-            opportunityRepository.save(opportunity);
+            Opportunity savedOpportunity =
+                    opportunityRepository.save(opportunity);
+
+
+            if (isNew) {
+                notificationService.notifyInterestedUsers(savedOpportunity);
+            }
         }
     }
 }

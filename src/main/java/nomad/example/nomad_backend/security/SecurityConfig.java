@@ -99,9 +99,10 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://127.0.0.1:5173",
-                "https://nomad-youth-platform.vercel.app"
+                "https://nomad-youth-platform.vercel.app",
+                "https://nomadyouth.com.az",
+                "https://www.nomadyouth.com.az"
         ));
-
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

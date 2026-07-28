@@ -2,6 +2,7 @@ package nomad.example.nomad_backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.service.ProfileService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,9 +19,12 @@ public class ProfileController {
     private final ProfileService profileService;
 
 
-    @PostMapping("/image")
+    @PostMapping(
+            value = "/image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<?> uploadImage(
-            @RequestParam("file") MultipartFile file
+            @RequestPart("file") MultipartFile file
     ) {
 
         try {

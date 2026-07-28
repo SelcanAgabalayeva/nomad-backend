@@ -22,7 +22,7 @@ public class OpportunityController {
 
     private final OpportunityRepository repository;
     private final ProjectService projectService;
-    // məlumatını qarışdırır) - bu, ayrıca diqqət tələb edən mövcud bir
+    // məlumatını qarışdırır))) - bu, ayrıca diqqət tələb edən mövcud bir
     // məsələdir, bu dəyişikliklə əlaqəli deyiil.
     @GetMapping
     public List<Opportunity> getAll() {

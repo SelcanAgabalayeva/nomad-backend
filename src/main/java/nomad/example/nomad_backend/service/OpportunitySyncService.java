@@ -28,7 +28,8 @@ public class OpportunitySyncService {
 
         System.out.println("SYNC STARTED");
 
-        List<List<Object>> rows = googleSheetsService.read("Sheet1!A2:L100");
+        List<List<Object>> rows =
+                googleSheetsService.read("Sheet1!A2:P100");
 
         System.out.println("ROW COUNT: " + rows.size());
 
@@ -65,6 +66,10 @@ public class OpportunitySyncService {
             String applyLink = cell(row, 10);
 
             String openingDate = cell(row, 11);
+            String duration = cell(row, 12);
+            String language = cell(row, 13);
+            String eventDateRange = cell(row, 14);
+            String financialSupport = cell(row, 15);
 
             String uniqueKey = title + "_" + deadline;
 
@@ -102,6 +107,10 @@ public class OpportunitySyncService {
             opportunity.setUniqueKey(uniqueKey);
             opportunity.setCountry(country);
             opportunity.setApplyLink(applyLink);
+            opportunity.setDuration(duration);
+            opportunity.setLanguage(language);
+            opportunity.setEventDateRange(eventDateRange);
+            opportunity.setFinancialSupport(financialSupport);
 
             LocalDate openingDateValue = null;
 

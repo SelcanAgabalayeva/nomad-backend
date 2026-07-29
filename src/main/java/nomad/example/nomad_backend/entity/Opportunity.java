@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-
 @Entity
 @Table(name = "opportunities")
 @Getter
@@ -45,12 +44,24 @@ public class Opportunity {
 
     private String duration;
     private String language;
-    private String eventDateRange;
-    private String financialSupport;
+
 
     private String city;
-    private String volunteeringType;
-    private String ageRequirement;
     private String escOrSalto;
+
+    @Column(length = 1000)
+    private String eventDateRange;
+
+
+    @Column(length = 1000)
+    private String financialSupport;
+
+
+    @Column(length = 1000)
+    private String ageRequirement;
+
+
+    @Column(length = 1000)
+    private String volunteeringType;
 }
 

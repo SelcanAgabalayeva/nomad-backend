@@ -50,45 +50,39 @@ public class OpportunitySyncService {
                 continue;
             }
 
-            String ss = cell(row, 0);
+            String title = cell(row, 0);
+            String deadline = cell(row, 1);
+            String eventDateRange = cell(row, 2);
 
-            String title = cell(row, 1);
+            String duration = cell(row, 3);
 
-            String deadline = cell(row, 2);
+            String type = cell(row, 4);
 
-            String eventDateRange = cell(row, 3);
+            String volunteeringType = cell(row, 5);
 
-            String duration = cell(row, 4);
+            String ageRequirement = cell(row, 6);
 
-            String type = cell(row, 5);
+            String category = cell(row, 7);
 
-            String volunteeringType = cell(row, 6);
+            String sumAz = cell(row, 8);
+            String sumEn = cell(row, 9);
+            String sumRus = cell(row, 10);
 
-            String ageRequirement = cell(row, 7);
+            String city = cell(row, 11);
 
-            String category = cell(row, 8);
+            String financialSupport = cell(row, 12);
 
-            String sumAz = cell(row, 9);
+            String language = cell(row, 13);
 
-            String sumEn = cell(row, 10);
+            String sort = cell(row, 14);
 
-            String sumRus = cell(row, 11);
+            String country = cell(row, 15);
 
-            String city = cell(row, 12);
+            String applyLink = cell(row, 16);
 
-            String financialSupport = cell(row, 13);
+            String escOrSalto = cell(row, 17);
 
-            String language = cell(row, 14);
-
-            String sort = cell(row, 15);
-
-            String country = cell(row, 16);
-
-            String applyLink = cell(row, 17);
-
-            String escOrSalto = cell(row, 18);
-
-            String openingDate = cell(row, 19);
+            String openingDate = cell(row, 18);
 
             String uniqueKey = title + "_" + deadline;
 

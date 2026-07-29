@@ -22,8 +22,13 @@ public class OpportunityDetailResponse {
     private LocalDate openingDate;
 
     private String description;
-    private String applyLink;   // "Müraciət et" düyməsinə kliklədikdə açılacaq link
+    private String applyLink;
     private boolean isFavorite;
     private boolean isSaved;
     private boolean isApplied;
+
+    private String duration;
+    private String language;
+    private String eventDateRange;
+    private String financialSupport;
 }

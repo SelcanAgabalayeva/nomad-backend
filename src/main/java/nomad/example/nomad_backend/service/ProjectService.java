@@ -1,5 +1,6 @@
 package nomad.example.nomad_backend.service;
 
+import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.OpportunityCardResponse;
 import nomad.example.nomad_backend.dtos.OpportunityDetailResponse;
 import nomad.example.nomad_backend.dtos.PlatformStatsResponse;
@@ -172,6 +173,11 @@ public class ProjectService {
                 .applyLink(opp.getApplyLink())
                 .isSaved(isSaved)
                 .isApplied(isApplied)
+                // DƏYİŞDİ: yeni detal sahələri entity-dən DTO-ya ötürülür
+                .duration(opp.getDuration())
+                .language(opp.getLanguage())
+                .eventDateRange(opp.getEventDateRange())
+                .financialSupport(opp.getFinancialSupport())
                 .build();
     }
 

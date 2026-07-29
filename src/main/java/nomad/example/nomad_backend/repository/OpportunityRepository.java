@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface OpportunityRepository extends JpaRepository<Opportunity, Long> {
 
-    long countByDeadlineGreaterThanEqual(LocalDate date);
+    long countByActiveTrueAndDeadlineGreaterThanEqual(LocalDate date);
 
     @Query("SELECT COUNT(DISTINCT o.category) FROM Opportunity o")
     long countDistinctCategories();
@@ -26,4 +26,6 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
     List<Opportunity> searchOpportunities(
             @Param("search") String search,
             @Param("category") String category);
+    List<Opportunity> findByActiveTrue();
+    Optional<Opportunity> findByIdAndActiveTrue(Long id);
 }

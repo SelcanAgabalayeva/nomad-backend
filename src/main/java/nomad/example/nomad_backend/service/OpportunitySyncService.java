@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,6 +38,10 @@ public class OpportunitySyncService {
         // 14 language | 15 sort(format) | 16 country | 17 applyLink |
         // 18 escOrSalto | 19 openingDate
         List<List<Object>> rows = googleSheetsService.read("Sheet1!A2:T1000");
+
+        System.out.println("ROW COUNT: " + rows.size());
+
+        List<String> sheetKeys = new ArrayList<>();
 
         System.out.println("ROW COUNT: " + rows.size());
 
@@ -72,6 +77,7 @@ public class OpportunitySyncService {
             String escOrSalto = cell(row,17);
             String openingDate = cell(row,18);
             String uniqueKey = title + "_" + deadline;
+            sheetKeys.add(uniqueKey);
 
             boolean isNew = opportunityRepository
                     .findByUniqueKey(uniqueKey)
@@ -130,6 +136,7 @@ public class OpportunitySyncService {
             System.out.println("DEADLINE: " + deadline);
             System.out.println("UNIQUE KEY: " + uniqueKey);
             System.out.println("----------------------------");
+            opportunity.setActive(true);
             Opportunity savedOpportunity =
                     opportunityRepository.save(opportunity);
 
@@ -137,6 +144,13 @@ public class OpportunitySyncService {
             if (isNew) {
                 notificationService.notifyInterestedUsers(savedOpportunity);
             }
+            opportunityRepository.findAll()
+                    .stream()
+                    .filter(op -> !sheetKeys.contains(op.getUniqueKey()))
+                    .forEach(op -> {
+                        op.setActive(false);
+                        opportunityRepository.save(op);
+                    });
         }
     }
 }

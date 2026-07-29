@@ -92,7 +92,8 @@ public class ProjectService {
 
     public List<OpportunityCardResponse> getAllOpportunitiesForCards(Long userId) {
 
-        List<Opportunity> opportunities = opportunityRepository.findAll();
+        List<Opportunity> opportunities =
+                opportunityRepository.findByActiveTrue();
 
         Map<Long, ProjectStatus> userProjectStatusMap = java.util.Collections.emptyMap();
         if (userId != null) {
@@ -135,7 +136,7 @@ public class ProjectService {
 
     public OpportunityDetailResponse getOpportunityDetails(Long opportunityId, Long userId, String lang) {
 
-        Opportunity opp = opportunityRepository.findById(opportunityId)
+        Opportunity opp = opportunityRepository.findByIdAndActiveTrue(opportunityId)
                 .orElseThrow(() -> new RuntimeException("Elan tapılmadı"));
 
         boolean isSaved = false;
@@ -185,7 +186,7 @@ public class ProjectService {
     }
 
     public PlatformStatsResponse getPlatformStatistics() {
-        long activeCount = opportunityRepository.countByDeadlineGreaterThanEqual(LocalDate.now());
+        long activeCount = opportunityRepository.countByActiveTrueAndDeadlineGreaterThanEqual(LocalDate.now());
         long categoriesCount = opportunityRepository.countDistinctCategories();
 
         return PlatformStatsResponse.builder()
@@ -201,8 +202,11 @@ public class ProjectService {
         String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
         String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar")) ? category.trim() : null;
 
-        List<Opportunity> opportunities = opportunityRepository.searchOpportunities(searchParam, categoryParam);
-
+        List<Opportunity> opportunities =
+                opportunityRepository.searchOpportunities(searchParam, categoryParam)
+                        .stream()
+                        .filter(Opportunity::isActive)
+                        .collect(Collectors.toList());
         Map<Long, ProjectStatus> userProjectStatusMap = java.util.Collections.emptyMap();
         if (userId != null) {
             userProjectStatusMap = projectRepository.findByUserId(userId).stream()

@@ -63,5 +63,6 @@ public class Opportunity {
 
     @Column(length = 1000)
     private String volunteeringType;
+    private boolean active = true;
 }
 

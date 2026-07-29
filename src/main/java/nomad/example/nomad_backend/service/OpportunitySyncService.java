@@ -144,14 +144,15 @@ public class OpportunitySyncService {
             if (isNew) {
                 notificationService.notifyInterestedUsers(savedOpportunity);
             }
-            opportunityRepository.findAll()
-                    .stream()
-                    .filter(op -> !sheetKeys.contains(op.getUniqueKey()))
-                    .forEach(op -> {
-                        op.setActive(false);
-                        opportunityRepository.save(op);
-                    });
+
         }
+        opportunityRepository.findAll()
+                .stream()
+                .filter(op -> !sheetKeys.contains(op.getUniqueKey()))
+                .forEach(op -> {
+                    op.setActive(false);
+                    opportunityRepository.save(op);
+                });
     }
 }
 

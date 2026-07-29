@@ -63,6 +63,7 @@ public class Opportunity {
 
     @Column(length = 1000)
     private String volunteeringType;
+    @Column(nullable = false)
     private boolean active = true;
 }
 

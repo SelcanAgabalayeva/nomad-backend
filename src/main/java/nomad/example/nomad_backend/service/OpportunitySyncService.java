@@ -29,8 +29,7 @@ public class OpportunitySyncService {
         System.out.println("SYNC STARTED");
 
         List<List<Object>> rows =
-                googleSheetsService.read("Sheet1!A2:P100");
-
+                googleSheetsService.read("Sheet1!A2:S100");
         System.out.println("ROW COUNT: " + rows.size());
 
         for (List<Object> row : rows) {
@@ -43,33 +42,34 @@ public class OpportunitySyncService {
                 continue;
             }
 
-            String ss = cell(row, 0);
+            String title = cell(row, 0);
+            String deadline = cell(row, 1);
+            String eventDateRange = cell(row, 2);
+            String duration = cell(row, 3);
+            String type = cell(row, 4);
 
-            String title = cell(row, 1);
+// İstifadə etmirsənsə bunları oxumağa ehtiyac yoxdur
+            String volunteeringType = cell(row, 5);
+            String ageRequirement = cell(row, 6);
 
-            String deadline = cell(row, 2);
+            String category = cell(row, 7);
 
-            String type = cell(row, 3);
+            String sumAz = cell(row, 8);
+            String sumEn = cell(row, 9);
+            String sumRus = cell(row, 10);
 
-            String category = cell(row, 4);
+// Şəhər lazım olarsa
+            String city = cell(row, 11);
 
-            String sumAz = cell(row, 5);
-
-            String sumEn = cell(row, 6);
-
-            String sumRus = cell(row, 7);
-
-            String sort = cell(row, 8);
-
-            String country = cell(row, 9);
-
-            String applyLink = cell(row, 10);
-
-            String openingDate = cell(row, 11);
-            String duration = cell(row, 12);
+            String financialSupport = cell(row, 12);
             String language = cell(row, 13);
-            String eventDateRange = cell(row, 14);
-            String financialSupport = cell(row, 15);
+            String sort = cell(row, 14);
+            String country = cell(row, 15);
+            String applyLink = cell(row, 16);
+
+// Lazım olarsa
+            String escOrSalto = cell(row, 17);
+            String openingDate = cell(row, 18);
 
             String uniqueKey = title + "_" + deadline;
 

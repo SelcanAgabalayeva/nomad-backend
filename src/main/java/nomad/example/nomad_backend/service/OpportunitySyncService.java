@@ -28,8 +28,16 @@ public class OpportunitySyncService {
 
         System.out.println("SYNC STARTED");
 
-        List<List<Object>> rows =
-                googleSheetsService.read("Sheet1!A2:S100");
+        // QEYD: cədvələ yeni sütunlar D-L arasına daxil edildiyi üçün
+        // BÜTÜN indekslər (təkcə yeni sahələr yox) yenidən uyğunlaşdırıldı.
+        // Real sütun sırası (A-T):
+        // 0 ss | 1 title | 2 deadline | 3 eventDateRange | 4 duration |
+        // 5 type | 6 volunteeringType | 7 ageRequirement | 8 category |
+        // 9 sumAz | 10 sumEn | 11 sumRus | 12 city | 13 financialSupport |
+        // 14 language | 15 sort(format) | 16 country | 17 applyLink |
+        // 18 escOrSalto | 19 openingDate
+        List<List<Object>> rows = googleSheetsService.read("Sheet1!A2:T1000");
+
         System.out.println("ROW COUNT: " + rows.size());
 
         for (List<Object> row : rows) {
@@ -42,34 +50,45 @@ public class OpportunitySyncService {
                 continue;
             }
 
-            String title = cell(row, 0);
-            String deadline = cell(row, 1);
-            String eventDateRange = cell(row, 2);
-            String duration = cell(row, 3);
-            String type = cell(row, 4);
+            String ss = cell(row, 0);
 
-// İstifadə etmirsənsə bunları oxumağa ehtiyac yoxdur
-            String volunteeringType = cell(row, 5);
-            String ageRequirement = cell(row, 6);
+            String title = cell(row, 1);
 
-            String category = cell(row, 7);
+            String deadline = cell(row, 2);
 
-            String sumAz = cell(row, 8);
-            String sumEn = cell(row, 9);
-            String sumRus = cell(row, 10);
+            String eventDateRange = cell(row, 3);
 
-// Şəhər lazım olarsa
-            String city = cell(row, 11);
+            String duration = cell(row, 4);
 
-            String financialSupport = cell(row, 12);
-            String language = cell(row, 13);
-            String sort = cell(row, 14);
-            String country = cell(row, 15);
-            String applyLink = cell(row, 16);
+            String type = cell(row, 5);
 
-// Lazım olarsa
-            String escOrSalto = cell(row, 17);
-            String openingDate = cell(row, 18);
+            String volunteeringType = cell(row, 6);
+
+            String ageRequirement = cell(row, 7);
+
+            String category = cell(row, 8);
+
+            String sumAz = cell(row, 9);
+
+            String sumEn = cell(row, 10);
+
+            String sumRus = cell(row, 11);
+
+            String city = cell(row, 12);
+
+            String financialSupport = cell(row, 13);
+
+            String language = cell(row, 14);
+
+            String sort = cell(row, 15);
+
+            String country = cell(row, 16);
+
+            String applyLink = cell(row, 17);
+
+            String escOrSalto = cell(row, 18);
+
+            String openingDate = cell(row, 19);
 
             String uniqueKey = title + "_" + deadline;
 
@@ -105,12 +124,15 @@ public class OpportunitySyncService {
             opportunity.setCountry(country);
             opportunity.setApplyLink(applyLink);
             opportunity.setUniqueKey(uniqueKey);
-            opportunity.setCountry(country);
-            opportunity.setApplyLink(applyLink);
-            opportunity.setDuration(duration);
-            opportunity.setLanguage(language);
-            opportunity.setEventDateRange(eventDateRange);
-            opportunity.setFinancialSupport(financialSupport);
+
+            opportunity.setDuration(duration.isBlank() ? null : duration);
+            opportunity.setLanguage(language.isBlank() ? null : language);
+            opportunity.setEventDateRange(eventDateRange.isBlank() ? null : eventDateRange);
+            opportunity.setFinancialSupport(financialSupport.isBlank() ? null : financialSupport);
+            opportunity.setCity(city.isBlank() ? null : city);
+            opportunity.setVolunteeringType(volunteeringType.isBlank() ? null : volunteeringType);
+            opportunity.setAgeRequirement(ageRequirement.isBlank() ? null : ageRequirement);
+            opportunity.setEscOrSalto(escOrSalto.isBlank() ? null : escOrSalto);
 
             LocalDate openingDateValue = null;
 
@@ -137,3 +159,4 @@ public class OpportunitySyncService {
         }
     }
 }
+

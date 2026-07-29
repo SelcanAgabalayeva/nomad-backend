@@ -173,11 +173,14 @@ public class ProjectService {
                 .applyLink(opp.getApplyLink())
                 .isSaved(isSaved)
                 .isApplied(isApplied)
-                // DƏYİŞDİ: yeni detal sahələri entity-dən DTO-ya ötürülür
                 .duration(opp.getDuration())
                 .language(opp.getLanguage())
                 .eventDateRange(opp.getEventDateRange())
                 .financialSupport(opp.getFinancialSupport())
+                .city(opp.getCity())
+                .volunteeringType(opp.getVolunteeringType())
+                .ageRequirement(opp.getAgeRequirement())
+                .escOrSalto(opp.getEscOrSalto())
                 .build();
     }
 
@@ -239,3 +242,4 @@ public class ProjectService {
         }).collect(Collectors.toList());
     }
 }
+

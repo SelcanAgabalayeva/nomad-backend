@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -31,4 +32,10 @@ public class OpportunityDetailResponse {
     private String language;
     private String eventDateRange;
     private String financialSupport;
+
+    private String city;
+    private String volunteeringType;
+    private String ageRequirement;
+    private String escOrSalto;
 }
+

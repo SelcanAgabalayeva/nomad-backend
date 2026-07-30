@@ -17,7 +17,7 @@ public class OpportunityCardResponse {
     private String country;
     private String type;
     private String category;
-    private String sort;
+    private String typeDetail;
     private LocalDate deadline;
     private LocalDate openingDate;
     private long daysLeft; // Qalan gün sayı

@@ -17,7 +17,7 @@ public class OpportunityDetailResponse {
     private String country;
     private String type;
     private String category;
-    private String sort;
+    private String typeDetail;
     private LocalDate deadline;
     private LocalDate openingDate;
 

@@ -23,7 +23,7 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
             "(:search IS NULL OR " +
             "LOWER(o.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
             "LOWER(o.country) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(o.sort) LIKE LOWER(CONCAT('%', :search, '%')))")
+            "LOWER(o.typeDetail) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<Opportunity> searchOpportunities(
             @Param("search") String search,
             @Param("category") String category);

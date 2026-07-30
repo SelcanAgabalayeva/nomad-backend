@@ -34,7 +34,9 @@ public class Opportunity {
     @Column(length = 2000)
     private String sumRus;
 
-    private String sort;
+    // Sheet-də "Növü"
+    private String typeDetail;
+
     private String country;
     private String applyLink;
     @Column(name = "opening_date")

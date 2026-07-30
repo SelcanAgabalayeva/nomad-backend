@@ -77,7 +77,7 @@ public class OpportunitySyncService {
             String city = cell(row,12);
             String financialSupport = cell(row,13);
             String language = cell(row,14);
-            String sort = cell(row,15);
+            String typeDetail = cell(row,15);
             String country = cell(row,16);
             String applyLink = cell(row,17);
             String escOrSalto = cell(row,18);
@@ -113,7 +113,7 @@ public class OpportunitySyncService {
             opportunity.setSumAz(sumAz);
             opportunity.setSumEn(sumEn);
             opportunity.setSumRus(sumRus);
-            opportunity.setSort(sort);
+            opportunity.setTypeDetail(typeDetail);
             opportunity.setCountry(country);
             opportunity.setApplyLink(applyLink);
             opportunity.setUniqueKey(uniqueKey);
@@ -152,6 +152,7 @@ public class OpportunitySyncService {
             }
 
         }
+
 
         opportunityRepository.findAll()
                 .stream()

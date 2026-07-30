@@ -26,7 +26,9 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
             "LOWER(o.typeDetail) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<Opportunity> searchOpportunities(
             @Param("search") String search,
-            @Param("category") String category);
+            @Param("category") String category,
+            @Param("format") String format); // <-- @Param("format") ƏLAVƏ EDİLDİ
+
     List<Opportunity> findByActiveTrue();
     Optional<Opportunity> findByIdAndActiveTrue(Long id);
 }

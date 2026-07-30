@@ -52,8 +52,10 @@ public class OpportunityController {
     public ResponseEntity<List<OpportunityCardResponse>> getOpportunityCards(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String category) {
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String format) { // <-- 1. FORMAT PARANETRİ ƏLAVƏ EDİLDİ
 
-        return ResponseEntity.ok(projectService.getAllOpportunitiesForCards(userId, search, category));
+        // <-- 2. FORMAT PARAMETRİ SERVICE-Ə ÖTÜRÜLDÜ
+        return ResponseEntity.ok(projectService.getAllOpportunitiesForCards(userId, search, category, format));
     }
 }

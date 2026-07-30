@@ -197,16 +197,24 @@ public class ProjectService {
                 .build();
     }
 
-    public List<OpportunityCardResponse> getAllOpportunitiesForCards(Long userId, String search, String category) {
+    public List<OpportunityCardResponse> getAllOpportunitiesForCards(
+            Long userId,
+            String search,
+            String category,
+            String format) { // <-- Format parametri əlavə olundu
 
         String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
         String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar")) ? category.trim() : null;
 
+        // Front-end-dən "Hamısı" və ya boş gələrsə null edirik ki, filtrlənməsin
+        String formatParam = (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı")) ? format.trim() : null;
+
         List<Opportunity> opportunities =
-                opportunityRepository.searchOpportunities(searchParam, categoryParam)
+                opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam) // <-- formatParam ötürülür
                         .stream()
                         .filter(Opportunity::isActive)
                         .collect(Collectors.toList());
+
         Map<Long, ProjectStatus> userProjectStatusMap = java.util.Collections.emptyMap();
         if (userId != null) {
             userProjectStatusMap = projectRepository.findByUserId(userId).stream()

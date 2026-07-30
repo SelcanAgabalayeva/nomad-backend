@@ -206,15 +206,14 @@ public class ProjectService {
         String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
         String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar") && !category.equalsIgnoreCase("Hamısı")) ? category.trim() : null;
 
-        // FRONTEND-DƏN GƏLƏN "Onlayn" / "Əyani" SÖZLƏRİNİ BAZA İLƏ UYĞUNLAŞDIRIRIQ:
-        // Frontend-dən "Onlayn" / "Əyani" gələrsə, bazadakı "Online" / "Offline" sözlərinə çeviririk:
+        // FORMATI ELƏ TƏNZİMLƏYİRİK Kİ, BAZADA HƏM "Onlayn", HƏM DƏ "Online" YAZILSA TAPILSIN:
         String formatParam = null;
         if (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı") && !format.equalsIgnoreCase("Bütün kateqoriyalar")) {
             String trimmed = format.trim();
             if (trimmed.equalsIgnoreCase("Onlayn") || trimmed.equalsIgnoreCase("Online")) {
-                formatParam = "Online";  // Bazadakı tam söz
+                formatParam = "onl"; // 'onl' axtaracaq -> həm 'Onlayn', həm 'Online', həm 'online' sözlərini tapacaq!
             } else if (trimmed.equalsIgnoreCase("Əyani") || trimmed.equalsIgnoreCase("Offline")) {
-                formatParam = "Offline"; // Bazadakı tam söz
+                formatParam = "off"; // həm 'Offline', həm 'Əyani', həm 'offline' sözlərini tapacaq
             } else {
                 formatParam = trimmed;
             }
@@ -256,7 +255,7 @@ public class ProjectService {
                     .type(opp.getType())
                     .category(opp.getCategory())
                     .typeDetail(opp.getTypeDetail())
-                    .format(opp.getTypeDetail()) // <-- ƏSAS MƏSƏLƏ: Front-end üçün typeDetail-i format kimi mənimsədirik
+                    .format(opp.getTypeDetail())
                     .deadline(opp.getDeadline())
                     .openingDate(opp.getOpeningDate())
                     .daysLeft(daysLeft)
@@ -267,5 +266,7 @@ public class ProjectService {
                     .build();
         }).collect(Collectors.toList());
     }
-}
+
+
+    }
 

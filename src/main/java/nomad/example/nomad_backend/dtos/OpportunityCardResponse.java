@@ -26,4 +26,6 @@ public class OpportunityCardResponse {
     // İstifadəçinin bu karta qarşı olan statusu
     private boolean isSaved;   // Şəkildəki bookmark ikonu üçün
     private boolean isApplied; // "Müraciət et" düyməsinin aktiv/passivliyi üçün
+    private String escOrSalto;
+    private String volunteeringType;
 }

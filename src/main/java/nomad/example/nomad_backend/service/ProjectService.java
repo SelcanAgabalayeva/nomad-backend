@@ -251,6 +251,8 @@ public class ProjectService {
                     .daysLeft(daysLeft)
                     .isSaved(isSaved)
                     .isApplied(isApplied)
+                    .escOrSalto(opp.getEscOrSalto())
+                    .volunteeringType(opp.getVolunteeringType())
                     .build();
         }).collect(Collectors.toList());
     }

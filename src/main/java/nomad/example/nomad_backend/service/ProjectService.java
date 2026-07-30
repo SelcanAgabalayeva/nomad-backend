@@ -207,13 +207,14 @@ public class ProjectService {
         String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar") && !category.equalsIgnoreCase("Hamısı")) ? category.trim() : null;
 
         // FRONTEND-DƏN GƏLƏN "Onlayn" / "Əyani" SÖZLƏRİNİ BAZA İLƏ UYĞUNLAŞDIRIRIQ:
+        // Frontend-dən "Onlayn" / "Əyani" gələrsə, bazadakı "Online" / "Offline" sözlərinə çeviririk:
         String formatParam = null;
-        if (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı")) {
+        if (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı") && !format.equalsIgnoreCase("Bütün kateqoriyalar")) {
             String trimmed = format.trim();
             if (trimmed.equalsIgnoreCase("Onlayn") || trimmed.equalsIgnoreCase("Online")) {
-                formatParam = "online"; // Bazada 'online' və ya 'Onlayn' axtaracaq
+                formatParam = "Online";  // Bazadakı tam söz
             } else if (trimmed.equalsIgnoreCase("Əyani") || trimmed.equalsIgnoreCase("Offline")) {
-                formatParam = "offline"; // Bazada 'offline' və ya 'Əyani' axtaracaq
+                formatParam = "Offline"; // Bazadakı tam söz
             } else {
                 formatParam = trimmed;
             }

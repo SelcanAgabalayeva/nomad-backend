@@ -201,7 +201,7 @@ public class ProjectService {
             Long userId,
             String search,
             String category,
-            String format) { // <-- Format parametri əlavə olundu
+            String format) {
 
         String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
         String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar")) ? category.trim() : null;
@@ -210,7 +210,7 @@ public class ProjectService {
         String formatParam = (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı")) ? format.trim() : null;
 
         List<Opportunity> opportunities =
-                opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam) // <-- formatParam ötürülür
+                opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam)
                         .stream()
                         .filter(Opportunity::isActive)
                         .collect(Collectors.toList());
@@ -245,6 +245,7 @@ public class ProjectService {
                     .type(opp.getType())
                     .category(opp.getCategory())
                     .typeDetail(opp.getTypeDetail())
+                    .format(opp.getTypeDetail()) // <-- ƏSAS MƏSƏLƏ: Front-end üçün typeDetail-i format kimi mənimsədirik
                     .deadline(opp.getDeadline())
                     .openingDate(opp.getOpeningDate())
                     .daysLeft(daysLeft)

@@ -45,7 +45,7 @@ public class WishlistService {
     // İNDİ: əvvəlcə (userId, opportunityId) cütü ilə mövcud UserProject
     // axtarılır; tapılmasa, YENİ yaradılır (status: SAVED). Sonra bu
     // sətrin ÖZ id-si ilə wishlist-ə bağlanır.
-    public Wishlist addToWishlist(Integer userId, Long opportunityId) {
+    public Wishlist addToWishlist(Long userId, Long opportunityId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -67,7 +67,7 @@ public class WishlistService {
                 .orElseGet(() -> wishlistRepository.save(new Wishlist(null, user, project, null)));
     }
 
-    public List<UserProject> getUserWishlist(Integer userId) {
+    public List<UserProject> getUserWishlist(Long userId) {
         return wishlistRepository.findByUserId(userId)
                 .stream()
                 .map(Wishlist::getProject)
@@ -75,7 +75,7 @@ public class WishlistService {
     }
 
     @Transactional
-    public void removeFromWishlist(Integer userId, Long opportunityId) {
+    public void removeFromWishlist(Long userId, Long opportunityId) {
         projectRepository.findByUser_IdAndOpportunity_Id(userId, opportunityId)
                 .ifPresent(project ->
                         wishlistRepository.deleteByUserIdAndProjectId(userId, project.getId())

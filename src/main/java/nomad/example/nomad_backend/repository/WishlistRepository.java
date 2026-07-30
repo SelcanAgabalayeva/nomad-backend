@@ -13,11 +13,11 @@ import java.util.Optional;
 @Repository
 public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
-    List<Wishlist> findByUserId(Integer userId);
+    List<Wishlist> findByUserId(Long userId);
 
-    Optional<Wishlist> findByUserIdAndProjectId(Integer userId, Long projectId);
+    Optional<Wishlist> findByUserIdAndProjectId(Long userId, Long projectId);
 
-    void deleteByUserIdAndProjectId(Integer userId, Long projectId);
+    void deleteByUserIdAndProjectId(Long userId, Long projectId);
 
     // Yeni əlavə olunan bildiriş üçün filtrasiya sorğusu:
     @Query("SELECT DISTINCT w.user FROM Wishlist w " +
@@ -31,4 +31,7 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
             @Param("type") String type,
             @Param("category") String category
     );
+
+    void deleteByUser(User user);
+
 }

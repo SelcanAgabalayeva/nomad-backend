@@ -21,19 +21,19 @@ public class LikeController {
 
     @PostMapping("/add")
     public ResponseEntity<Like> addLike(
-            @RequestParam Integer userId,
+            @RequestParam Long userId,
             @RequestParam Long projectId) {
         return ResponseEntity.ok(likeService.addLike(userId, projectId));
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<UserProject>> getUserLikes(@PathVariable Integer userId) {
+    public ResponseEntity<List<UserProject>> getUserLikes(@PathVariable Long userId) {
         return ResponseEntity.ok(likeService.getUserLikes(userId));
     }
 
     @DeleteMapping("/remove")
     public ResponseEntity<Void> removeLike(
-            @RequestParam Integer userId,
+            @RequestParam Long userId,
             @RequestParam Long projectId) {
         likeService.removeLike(userId, projectId);
         return ResponseEntity.noContent().build();

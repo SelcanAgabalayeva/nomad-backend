@@ -55,7 +55,7 @@ public class ProjectController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/status")
     public ResponseEntity<UserProject> setStatus(
-            @RequestParam Integer userId,
+            @RequestParam Long userId,
             @RequestParam Long opportunityId,
             @RequestParam(required = false) ProjectStatus status) {
         return ResponseEntity.ok(projectService.setProjectStatus(userId, opportunityId, status));

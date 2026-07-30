@@ -68,7 +68,7 @@ public class ProjectService {
     }
 
 
-    public UserProject setProjectStatus(Integer userId, Long opportunityId, ProjectStatus status) {
+    public UserProject setProjectStatus(Long userId, Long opportunityId, ProjectStatus status) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 

@@ -40,7 +40,7 @@ public class LikeService {
     // lazım olsa UserProject yaradılır (status SAVED qalır, çünki status
     // "saxlanma" vəziyyətini bildirir, "like" ayrı cədvəldə izlənir),
     // sonra ona bağlı Like sətri qurulur.
-    public Like addLike(Integer userId, Long opportunityId) {
+    public Like addLike(Long userId, Long opportunityId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -62,7 +62,7 @@ public class LikeService {
                 .orElseGet(() -> likeRepository.save(new Like(null, user, project, null)));
     }
 
-    public List<UserProject> getUserLikes(Integer userId) {
+    public List<UserProject> getUserLikes(Long userId) {
         return likeRepository.findByUserId(userId)
                 .stream()
                 .map(Like::getProject)
@@ -70,7 +70,7 @@ public class LikeService {
     }
 
     @Transactional
-    public void removeLike(Integer userId, Long opportunityId) {
+    public void removeLike(Long userId, Long opportunityId) {
         projectRepository.findByUser_IdAndOpportunity_Id(userId, opportunityId)
                 .ifPresent(project ->
                         likeRepository.deleteByUserIdAndProjectId(userId, project.getId())

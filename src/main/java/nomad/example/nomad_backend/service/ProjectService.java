@@ -204,10 +204,20 @@ public class ProjectService {
             String format) {
 
         String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
-        String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar")) ? category.trim() : null;
+        String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar") && !category.equalsIgnoreCase("Hamısı")) ? category.trim() : null;
 
-        // Front-end-dən "Hamısı" və ya boş gələrsə null edirik ki, filtrlənməsin
-        String formatParam = (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı")) ? format.trim() : null;
+        // FRONTEND-DƏN GƏLƏN "Onlayn" / "Əyani" SÖZLƏRİNİ BAZA İLƏ UYĞUNLAŞDIRIRIQ:
+        String formatParam = null;
+        if (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı")) {
+            String trimmed = format.trim();
+            if (trimmed.equalsIgnoreCase("Onlayn") || trimmed.equalsIgnoreCase("Online")) {
+                formatParam = "online"; // Bazada 'online' və ya 'Onlayn' axtaracaq
+            } else if (trimmed.equalsIgnoreCase("Əyani") || trimmed.equalsIgnoreCase("Offline")) {
+                formatParam = "offline"; // Bazada 'offline' və ya 'Əyani' axtaracaq
+            } else {
+                formatParam = trimmed;
+            }
+        }
 
         List<Opportunity> opportunities =
                 opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam)

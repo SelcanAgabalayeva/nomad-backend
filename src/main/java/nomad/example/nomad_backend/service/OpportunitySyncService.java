@@ -55,27 +55,33 @@ public class OpportunitySyncService {
                 continue;
             }
 
-            String title = cell(row,0);
-            String deadline = cell(row,1);
-            String eventDateRange = cell(row,2);
-            String duration = cell(row,3);
-            String type = cell(row,4);
-            String volunteeringType = cell(row,5);
-            String ageRequirement = cell(row,6);
-            String category = cell(row,7);
+            String ss = cell(row,0);
 
-            String sumAz = cell(row,8);
-            String sumEn = cell(row,9);
-            String sumRus = cell(row,10);
+            String title = cell(row,1)
+                    .replace("\n","")
+                    .trim();
 
-            String city = cell(row,11);
-            String financialSupport = cell(row,12);
-            String language = cell(row,13);
-            String sort = cell(row,14);
-            String country = cell(row,15);
-            String applyLink = cell(row,16);
-            String escOrSalto = cell(row,17);
-            String openingDate = cell(row,18);
+            String deadline = cell(row,2).trim();
+
+            String eventDateRange = cell(row,3);
+            String duration = cell(row,4);
+            String type = cell(row,5);
+            String volunteeringType = cell(row,6);
+            String ageRequirement = cell(row,7);
+            String category = cell(row,8);
+
+            String sumAz = cell(row,9);
+            String sumEn = cell(row,10);
+            String sumRus = cell(row,11);
+
+            String city = cell(row,12);
+            String financialSupport = cell(row,13);
+            String language = cell(row,14);
+            String sort = cell(row,15);
+            String country = cell(row,16);
+            String applyLink = cell(row,17);
+            String escOrSalto = cell(row,18);
+            String openingDate = cell(row,19);
             String uniqueKey = title + "_" + deadline;
             sheetKeys.add(uniqueKey);
 
@@ -146,10 +152,12 @@ public class OpportunitySyncService {
             }
 
         }
+
         opportunityRepository.findAll()
                 .stream()
                 .filter(op -> !sheetKeys.contains(op.getUniqueKey()))
                 .forEach(op -> {
+                    System.out.println("DEACTIVATED: " + op.getTitle());
                     op.setActive(false);
                     opportunityRepository.save(op);
                 });

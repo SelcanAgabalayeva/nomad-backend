@@ -18,11 +18,12 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
     Optional<Opportunity> findByUniqueKey(String uniqueKey);
 
     @Query("SELECT o FROM Opportunity o WHERE " +
+            "o.active = true AND " +
             "(:category IS NULL OR o.category = :category) AND " +
             "(:search IS NULL OR " +
-            " LOWER(o.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            " LOWER(o.country) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            " LOWER(o.sort) LIKE LOWER(CONCAT('%', :search, '%')))")
+            "LOWER(o.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(o.country) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(o.sort) LIKE LOWER(CONCAT('%', :search, '%')))")
     List<Opportunity> searchOpportunities(
             @Param("search") String search,
             @Param("category") String category);

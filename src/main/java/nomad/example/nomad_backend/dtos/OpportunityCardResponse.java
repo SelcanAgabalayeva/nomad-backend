@@ -20,7 +20,6 @@ public class OpportunityCardResponse {
     private String typeDetail;
     private LocalDate deadline;
     private LocalDate openingDate;
-    private String format;
     private long daysLeft; // Qalan gün sayı
 
     // İstifadəçinin bu karta qarşı olan statusu

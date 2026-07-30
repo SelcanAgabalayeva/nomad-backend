@@ -255,7 +255,6 @@ public class ProjectService {
                     .type(opp.getType())
                     .category(opp.getCategory())
                     .typeDetail(opp.getTypeDetail())
-                    .format(opp.getTypeDetail())
                     .deadline(opp.getDeadline())
                     .openingDate(opp.getOpeningDate())
                     .applyLink(opp.getApplyLink())

@@ -212,9 +212,9 @@ public class ProjectService {
         if (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı") && !format.equalsIgnoreCase("Bütün kateqoriyalar")) {
             String trimmed = format.trim();
             if (trimmed.equalsIgnoreCase("Onlayn") || trimmed.equalsIgnoreCase("Online")) {
-                formatParam = "onl"; // 'onl' yazırıq ki, bazada 'online', 'Online', 'Onlayn' — nə varsa tapılsın
+                formatParam = "Online";
             } else if (trimmed.equalsIgnoreCase("Əyani") || trimmed.equalsIgnoreCase("Offline")) {
-                formatParam = "off"; // 'off' yazırıq ki, 'offline', 'Offline', 'Əyani' — nə varsa tapılsın
+                formatParam = "Offline";
             } else {
                 formatParam = trimmed.toLowerCase();
             }

@@ -23,8 +23,8 @@ WHERE
 o.active = true
 AND (:category IS NULL OR o.category = :category)
 AND (
-    :format IS NULL 
-    OR LOWER(o.typeDetail) LIKE LOWER(CONCAT('%', :format, '%'))
+    :format IS NULL
+    OR LOWER(o.typeDetail) = LOWER(:format)
 )
 AND (
     :search IS NULL

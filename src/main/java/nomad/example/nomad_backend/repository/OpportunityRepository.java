@@ -23,11 +23,8 @@ WHERE
 o.active = true
 AND (:category IS NULL OR o.category = :category)
 AND (
-    :format IS NULL
-    OR (:format = 'Onlayn' AND LOWER(o.typeDetail) = 'online')
-    OR (:format = 'Online' AND LOWER(o.typeDetail) = 'online')
-    OR (:format = 'Əyani' AND LOWER(o.typeDetail) = 'offline')
-    OR (:format = 'Offline' AND LOWER(o.typeDetail) = 'offline')
+    :format IS NULL 
+    OR LOWER(o.typeDetail) LIKE LOWER(CONCAT('%', :format, '%'))
 )
 AND (
     :search IS NULL

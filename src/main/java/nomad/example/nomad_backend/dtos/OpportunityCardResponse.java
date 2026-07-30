@@ -28,4 +28,6 @@ public class OpportunityCardResponse {
     private boolean isApplied; // "Müraciət et" düyməsinin aktiv/passivliyi üçün
     private String escOrSalto;
     private String volunteeringType;
+    private String applyLink;
+
 }

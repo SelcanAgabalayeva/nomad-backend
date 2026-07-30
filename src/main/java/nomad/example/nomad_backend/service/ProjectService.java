@@ -207,18 +207,18 @@ public class ProjectService {
         String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar") && !category.equalsIgnoreCase("Hamısı")) ? category.trim() : null;
 
         // FORMATI ELƏ TƏNZİMLƏYİRİK Kİ, BAZADA HƏM "Onlayn", HƏM DƏ "Online" YAZILSA TAPILSIN:
+        // FORMATI ELƏ TƏNZİMLƏYİRİK Kİ, BAZADA "Online", "online", "Onlayn" VƏ YA "Offline", "Əyani" YAZILSA DAHİ TAPILSIN:
         String formatParam = null;
         if (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı") && !format.equalsIgnoreCase("Bütün kateqoriyalar")) {
             String trimmed = format.trim();
             if (trimmed.equalsIgnoreCase("Onlayn") || trimmed.equalsIgnoreCase("Online")) {
-                formatParam = "onl"; // 'onl' axtaracaq -> həm 'Onlayn', həm 'Online', həm 'online' sözlərini tapacaq!
+                formatParam = "onl"; // 'onl' yazırıq ki, bazada 'online', 'Online', 'Onlayn' — nə varsa tapılsın
             } else if (trimmed.equalsIgnoreCase("Əyani") || trimmed.equalsIgnoreCase("Offline")) {
-                formatParam = "off"; // həm 'Offline', həm 'Əyani', həm 'offline' sözlərini tapacaq
+                formatParam = "off"; // 'off' yazırıq ki, 'offline', 'Offline', 'Əyani' — nə varsa tapılsın
             } else {
-                formatParam = trimmed;
+                formatParam = trimmed.toLowerCase();
             }
         }
-
         List<Opportunity> opportunities =
                 opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam)
                         .stream()
@@ -258,6 +258,7 @@ public class ProjectService {
                     .format(opp.getTypeDetail())
                     .deadline(opp.getDeadline())
                     .openingDate(opp.getOpeningDate())
+                    .applyLink(opp.getApplyLink())
                     .daysLeft(daysLeft)
                     .isSaved(isSaved)
                     .isApplied(isApplied)

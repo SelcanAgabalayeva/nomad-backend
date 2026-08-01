@@ -1,8 +1,12 @@
 package nomad.example.nomad_backend.service.impls;
 
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.ProfileResponse;
+import nomad.example.nomad_backend.dtos.UpdateProfileRequest;
 import nomad.example.nomad_backend.dtos.UserResponseDto;
+import nomad.example.nomad_backend.entity.NotificationSettings;
 import nomad.example.nomad_backend.entity.User;
+import nomad.example.nomad_backend.repository.NotificationSettingsRepository;
 import nomad.example.nomad_backend.repository.UserRepository;
 import nomad.example.nomad_backend.service.ProfileService;
 import org.modelmapper.ModelMapper;
@@ -23,6 +27,8 @@ public class ProfileServiceImpl
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
     private final ModelMapper modelMapper;
+
+    private final NotificationSettingsRepository notificationSettingsRepository;
 
 
     @Override
@@ -74,5 +80,129 @@ public class ProfileServiceImpl
 
         userRepository.save(user);
     }
+
+    @Override
+    public ProfileResponse getProfile(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new RuntimeException("User tapılmadı"));
+
+
+        return mapToResponse(user);
+    }
+
+
+
+    @Override
+    public ProfileResponse updateProfile(Long userId,
+                                         UpdateProfileRequest request) {
+
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new RuntimeException("User tapılmadı"));
+
+
+        user.setFirstName(request.getFirstName());
+
+        user.setLastName(request.getLastName());
+
+        user.setPhoneNumber(request.getPhoneNumber());
+
+        user.setCountry(request.getCountry());
+
+        user.setCity(request.getCity());
+
+        user.setUniversity(request.getUniversity());
+
+        user.setMajor(request.getMajor());
+
+        user.setEducationLevel(request.getEducationLevel());
+
+        user.setBirthDate(request.getBirthDate());
+
+        user.setBio(request.getBio());
+
+
+        userRepository.save(user);
+
+
+        return mapToResponse(user);
+    }
+
+    @Override
+    public void completeProfile(Long id){
+
+        User user=userRepository.findById(id)
+                .orElseThrow();
+
+        user.setProfileCompleted(true);
+
+        userRepository.save(user);
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public NotificationSettings getPreferences(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new RuntimeException("User tapılmadı"));
+
+
+        return notificationSettingsRepository
+                .findByUser(user)
+                .orElseGet(() -> {
+
+                    NotificationSettings settings =
+                            NotificationSettings.builder()
+                                    .user(user)
+                                    .emailNotifications(true)
+                                    .inAppNotifications(true)
+                                    .newOpportunities(true)
+                                    .deadlineReminders(true)
+                                    .savedProjectChanges(true)
+                                    .platformUpdates(true)
+                                    .build();
+
+
+                    return notificationSettingsRepository.save(settings);
+                });
+    }
+    private ProfileResponse mapToResponse(User user){
+
+        return ProfileResponse.builder()
+
+                .id(user.getId())
+
+                .firstName(user.getFirstName())
+
+                .lastName(user.getLastName())
+
+                .email(user.getEmail())
+
+                .phoneNumber(user.getPhoneNumber())
+
+                .country(user.getCountry())
+
+                .city(user.getCity())
+
+                .university(user.getUniversity())
+
+                .major(user.getMajor())
+
+                .educationLevel(user.getEducationLevel())
+
+                .birthDate(user.getBirthDate())
+
+                .bio(user.getBio())
+
+                .profileImageUrl(user.getProfileImageUrl())
+
+                .profileCompleted(user.isProfileCompleted())
+
+                .build();
+    }
+
 
 }

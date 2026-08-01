@@ -3,6 +3,7 @@ package nomad.example.nomad_backend.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.entity.Role;
 import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -70,13 +71,11 @@ public class OAuth2SuccessHandler
 
                             User newUser = new User();
 
-
                             newUser.setFirstName(firstName);
 
                             newUser.setLastName(lastName);
 
                             newUser.setEmail(email);
-
 
                             newUser.setPassword("GOOGLE_USER");
 
@@ -84,8 +83,13 @@ public class OAuth2SuccessHandler
                                     "GOOGLE_" + email
                             );
 
-
                             newUser.setProvider("GOOGLE");
+
+                            newUser.setProfileCompleted(false);
+
+                            newUser.setEmailVerified(true);
+
+                            newUser.setRole(Role.USER);
 
 
                             return userRepository.save(newUser);

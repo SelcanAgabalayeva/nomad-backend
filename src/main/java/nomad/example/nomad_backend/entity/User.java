@@ -72,6 +72,14 @@ public class User {
     @OneToOne(mappedBy = "user",
             cascade = CascadeType.ALL)
     private NotificationSettings notificationSettings;
+    @Column(nullable = false)
+    private boolean profileCompleted = false;
+    private String country;
+
+    private String city;
+
+    @Column(columnDefinition = "TEXT")
+    private String bio;
 
 }
 

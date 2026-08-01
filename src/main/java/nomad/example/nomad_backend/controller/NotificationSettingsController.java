@@ -10,11 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/notification-settings")
 @RequiredArgsConstructor
 public class NotificationSettingsController {
-
-
     private final NotificationSettingsService service;
-
-
 
     @GetMapping
     public ResponseEntity<?> getSettings(){

@@ -1,5 +1,7 @@
 package nomad.example.nomad_backend.service;
 
+import nomad.example.nomad_backend.dtos.OpportunityResponse;
+import nomad.example.nomad_backend.dtos.WishlistResponse;
 import nomad.example.nomad_backend.entity.Opportunity;
 import nomad.example.nomad_backend.entity.ProjectStatus;
 import nomad.example.nomad_backend.entity.User;
@@ -45,16 +47,22 @@ public class WishlistService {
     // İNDİ: əvvəlcə (userId, opportunityId) cütü ilə mövcud UserProject
     // axtarılır; tapılmasa, YENİ yaradılır (status: SAVED). Sonra bu
     // sətrin ÖZ id-si ilə wishlist-ə bağlanır.
-    public Wishlist addToWishlist(Long userId, Long opportunityId) {
+    public WishlistResponse addToWishlist(Long userId, Long opportunityId) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Opportunity opportunity = opportunityRepository.findById(opportunityId)
                 .orElseThrow(() -> new RuntimeException(
-                        messageSource.getMessage("project.not.found", null, LocaleContextHolder.getLocale())
+                        messageSource.getMessage(
+                                "project.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
                 ));
 
-        UserProject project = projectRepository.findByUser_IdAndOpportunity_Id(userId, opportunityId)
+        UserProject project = projectRepository
+                .findByUser_IdAndOpportunity_Id(userId, opportunityId)
                 .orElseGet(() -> {
                     UserProject newProject = new UserProject();
                     newProject.setUser(user);
@@ -63,10 +71,30 @@ public class WishlistService {
                     return projectRepository.save(newProject);
                 });
 
-        return wishlistRepository.findByUserIdAndProjectId(userId, project.getId())
-                .orElseGet(() -> wishlistRepository.save(new Wishlist(null, user, project, null)));
-    }
 
+        Wishlist wishlist = wishlistRepository
+                .findByUserIdAndProjectId(userId, project.getId())
+                .orElseGet(() ->
+                        wishlistRepository.save(
+                                new Wishlist(null, user, project, null)
+                        )
+                );
+
+
+        return new WishlistResponse(
+                wishlist.getId(),
+                wishlist.getCreatedAt(),
+                new OpportunityResponse(
+                        opportunity.getId(),
+                        opportunity.getTitle(),
+                        opportunity.getCountry(),
+                        opportunity.getDeadline(),
+                        opportunity.getType(),
+                        opportunity.getCategory(),
+                        opportunity.getApplyLink()
+                )
+        );
+    }
     public List<UserProject> getUserWishlist(Long userId) {
         return wishlistRepository.findByUserId(userId)
                 .stream()

@@ -1,5 +1,6 @@
 package nomad.example.nomad_backend.controller;
 
+import nomad.example.nomad_backend.dtos.WishlistResponse;
 import nomad.example.nomad_backend.entity.UserProject;
 import nomad.example.nomad_backend.entity.Wishlist;
 import nomad.example.nomad_backend.service.WishlistService;
@@ -20,7 +21,7 @@ public class WishlistController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Wishlist> addToWishlist(
+    public ResponseEntity<WishlistResponse> addToWishlist(
             @RequestParam Long userId,
             @RequestParam Long projectId) {
         return ResponseEntity.ok(wishlistService.addToWishlist(userId, projectId));

@@ -68,7 +68,7 @@ public class EmailService {
         );
 
         String verificationLink =
-                "http://localhost:8080/api/auth/verify-email?token="
+                "https://nomad-backend.onrender.com/api/auth/verify-email?token="
                         + token;
 
 

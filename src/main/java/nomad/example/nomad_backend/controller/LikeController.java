@@ -1,5 +1,6 @@
 package nomad.example.nomad_backend.controller;
 
+import nomad.example.nomad_backend.dtos.LikeResponse;
 import nomad.example.nomad_backend.entity.Like;
 import nomad.example.nomad_backend.entity.UserProject;
 import nomad.example.nomad_backend.service.LikeService;
@@ -20,10 +21,13 @@ public class LikeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Like> addLike(
+    public ResponseEntity<LikeResponse> addLike(
             @RequestParam Long userId,
             @RequestParam Long projectId) {
-        return ResponseEntity.ok(likeService.addLike(userId, projectId));
+
+        return ResponseEntity.ok(
+                likeService.addLike(userId, projectId)
+        );
     }
 
     @GetMapping("/{userId}")

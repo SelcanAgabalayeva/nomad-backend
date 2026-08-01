@@ -1,5 +1,7 @@
 package nomad.example.nomad_backend.service;
 
+import nomad.example.nomad_backend.dtos.LikeResponse;
+import nomad.example.nomad_backend.dtos.OpportunityResponse;
 import nomad.example.nomad_backend.entity.Like;
 import nomad.example.nomad_backend.entity.Opportunity;
 import nomad.example.nomad_backend.entity.ProjectStatus;
@@ -40,16 +42,22 @@ public class LikeService {
     // lazım olsa UserProject yaradılır (status SAVED qalır, çünki status
     // "saxlanma" vəziyyətini bildirir, "like" ayrı cədvəldə izlənir),
     // sonra ona bağlı Like sətri qurulur.
-    public Like addLike(Long userId, Long opportunityId) {
+    public LikeResponse addLike(Long userId, Long opportunityId) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Opportunity opportunity = opportunityRepository.findById(opportunityId)
                 .orElseThrow(() -> new RuntimeException(
-                        messageSource.getMessage("project.not.found", null, LocaleContextHolder.getLocale())
+                        messageSource.getMessage(
+                                "project.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
                 ));
 
-        UserProject project = projectRepository.findByUser_IdAndOpportunity_Id(userId, opportunityId)
+        UserProject project = projectRepository
+                .findByUser_IdAndOpportunity_Id(userId, opportunityId)
                 .orElseGet(() -> {
                     UserProject newProject = new UserProject();
                     newProject.setUser(user);
@@ -58,8 +66,28 @@ public class LikeService {
                     return projectRepository.save(newProject);
                 });
 
-        return likeRepository.findByUserIdAndProjectId(userId, project.getId())
-                .orElseGet(() -> likeRepository.save(new Like(null, user, project, null)));
+
+        Like like = likeRepository.findByUserIdAndProjectId(userId, project.getId())
+                .orElseGet(() ->
+                        likeRepository.save(
+                                new Like(null, user, project, null)
+                        )
+                );
+
+
+        return new LikeResponse(
+                like.getId(),
+                like.getCreatedAt(),
+                new OpportunityResponse(
+                        opportunity.getId(),
+                        opportunity.getTitle(),
+                        opportunity.getCountry(),
+                        opportunity.getDeadline(),
+                        opportunity.getType(),
+                        opportunity.getCategory(),
+                        opportunity.getApplyLink()
+                )
+        );
     }
 
     public List<UserProject> getUserLikes(Long userId) {

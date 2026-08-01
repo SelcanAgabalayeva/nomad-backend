@@ -5,13 +5,11 @@ import nomad.example.nomad_backend.dtos.ChangePasswordRequest;
 import nomad.example.nomad_backend.dtos.UpdateUserRequest;
 import nomad.example.nomad_backend.dtos.UserResponse;
 import nomad.example.nomad_backend.entity.User;
-import nomad.example.nomad_backend.repository.LikeRepository;
-import nomad.example.nomad_backend.repository.RefreshTokenRepository;
-import nomad.example.nomad_backend.repository.UserRepository;
-import nomad.example.nomad_backend.repository.WishlistRepository;
+import nomad.example.nomad_backend.repository.*;
 import nomad.example.nomad_backend.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +20,10 @@ public class UserServiceImpl implements UserService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final WishlistRepository wishlistRepository;
     private final LikeRepository likeRepository;
+    private final ProjectRepository projectRepository;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+
 
 
     @Override
@@ -67,14 +69,24 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
     @Override
+    @Transactional
     public void deleteAccount(Long id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User tapılmadı"));
 
+
+        emailVerificationTokenRepository.deleteByUser(user);
+
+        passwordResetTokenRepository.deleteByUser(user);
+
         refreshTokenRepository.deleteByUser(user);
+
         wishlistRepository.deleteByUser(user);
+
         likeRepository.deleteByUser(user);
+
+        projectRepository.deleteByUser(user);
 
         userRepository.delete(user);
     }

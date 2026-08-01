@@ -87,7 +87,7 @@ public class OAuth2SuccessHandler
 
                             newUser.setProfileCompleted(false);
 
-                            newUser.setEmailVerified(true);
+                            newUser.setEmailVerified(false);
 
                             newUser.setRole(Role.USER);
 

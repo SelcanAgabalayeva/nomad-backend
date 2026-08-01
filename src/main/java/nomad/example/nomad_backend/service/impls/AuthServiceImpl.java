@@ -183,18 +183,24 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
+
                     User newUser = User.builder()
                             .firstName(firstName != null ? firstName : "")
                             .lastName(lastName != null ? lastName : "")
                             .email(email)
-                            .emailVerified(true)
+                            .emailVerified(false)
                             .password(null)
                             .provider("GOOGLE")
                             .role(Role.USER)
                             .termsAccepted(true)
                             .newsletter(false)
                             .build();
-                    return userRepository.save(newUser);
+
+                    User savedUser = userRepository.save(newUser);
+
+                    createEmailVerificationToken(savedUser);
+
+                    return savedUser;
                 });
 
         String token = jwtService.generateToken(user);

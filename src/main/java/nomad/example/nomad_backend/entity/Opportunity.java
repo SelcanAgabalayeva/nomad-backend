@@ -66,5 +66,8 @@ public class Opportunity {
     @Column(length = 1000)
     private String volunteeringType;
     private boolean active = true;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private OpportunityStatus status = OpportunityStatus.READY;
 }
 

@@ -3,6 +3,7 @@ package nomad.example.nomad_backend.service;
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.config.GoogleSheetsService;
 import nomad.example.nomad_backend.entity.Opportunity;
+import nomad.example.nomad_backend.entity.OpportunityStatus;
 import nomad.example.nomad_backend.repository.OpportunityRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -37,7 +38,7 @@ public class OpportunitySyncService {
         // 9 sumAz | 10 sumEn | 11 sumRus | 12 city | 13 financialSupport |
         // 14 language | 15 sort(format) | 16 country | 17 applyLink |
         // 18 escOrSalto | 19 openingDate
-        List<List<Object>> rows = googleSheetsService.read("Sheet1!A2:T1000");
+        List<List<Object>> rows = googleSheetsService.read("Sheet1!A2:U1000");
 
         System.out.println("ROW COUNT: " + rows.size());
 
@@ -82,6 +83,7 @@ public class OpportunitySyncService {
             String applyLink = cell(row,17);
             String escOrSalto = cell(row,18);
             String openingDate = cell(row,19);
+            String status = cell(row,20);
             String uniqueKey = title + "_" + deadline;
             sheetKeys.add(uniqueKey);
 
@@ -143,6 +145,13 @@ public class OpportunitySyncService {
             System.out.println("UNIQUE KEY: " + uniqueKey);
             System.out.println("----------------------------");
             opportunity.setActive(true);
+            if (status.isBlank()) {
+                opportunity.setStatus(OpportunityStatus.READY);
+            } else {
+                opportunity.setStatus(
+                        OpportunityStatus.valueOf(status.toUpperCase())
+                );
+            }
             Opportunity savedOpportunity =
                     opportunityRepository.save(opportunity);
 
@@ -160,6 +169,7 @@ public class OpportunitySyncService {
                 .forEach(op -> {
                     System.out.println("DEACTIVATED: " + op.getTitle());
                     op.setActive(false);
+                    op.setStatus(OpportunityStatus.DRAFT);
                     opportunityRepository.save(op);
                 });
     }

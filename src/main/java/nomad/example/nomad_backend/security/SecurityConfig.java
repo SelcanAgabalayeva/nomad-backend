@@ -54,11 +54,13 @@ public class SecurityConfig {
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/api/auth/google",
+                                "/api/auth/verify-email",
+                                "/api/auth/resend-verification",
                                 "/api/contact/**",
                                 "/oauth2/**",
                                 "/login/**",
                                 "/api/opportunities/**",
-                                "/api/v1/likes/**"   // <-- BUNU ƏLAVƏ ET
+                                "/api/v1/likes/**"
                         ).permitAll()
 
                         .requestMatchers(

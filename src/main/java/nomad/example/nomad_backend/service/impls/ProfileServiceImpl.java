@@ -139,25 +139,28 @@ public class ProfileServiceImpl
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Telefon nömrəsi başqa istifadəçiyə məxsusdursa
+        if (request.getPhoneNumber() != null &&
+                !request.getPhoneNumber().equals(user.getPhoneNumber())) {
+
+            userRepository.findByPhoneNumber(request.getPhoneNumber())
+                    .ifPresent(existingUser -> {
+                        throw new RuntimeException("Bu telefon nömrəsi artıq istifadə olunur.");
+                    });
+        }
+
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPhoneNumber(request.getPhoneNumber());
-
         user.setBirthDate(request.getBirthDate());
-
         user.setUniversity(request.getUniversity());
         user.setMajor(request.getMajor());
-
         user.setEducationLevel(request.getEducationLevel());
-
         user.setCountry(request.getCountry());
         user.setCity(request.getCity());
-
         user.setBio(request.getBio());
-
         user.setNewsletter(request.isNewsletter());
 
-        // maraq sahələri
         if (request.getInterests() != null) {
             user.setInterests(request.getInterests());
         }

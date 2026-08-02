@@ -69,5 +69,7 @@ public class Opportunity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private OpportunityStatus status = OpportunityStatus.READY;
+
+
 }
 

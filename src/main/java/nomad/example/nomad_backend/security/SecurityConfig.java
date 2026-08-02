@@ -67,7 +67,9 @@ public class SecurityConfig {
                                 "/api/auth/me",
                                 "/api/v1/projects/**",
                                 "/api/v1/wishlist/**",
-                                "/api/profile/**"
+                                "/api/profile/**",
+                                "/api/notification-settings/**",
+                                "/api/notifications/**"
                         ).hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers(

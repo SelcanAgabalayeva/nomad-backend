@@ -14,5 +14,7 @@ public interface NotificationService {
     void markAsRead(Long notificationId);
 
     Integer getUnreadCount();
+    void notifySavedProjectChanges(Opportunity opportunity);
+
 
 }

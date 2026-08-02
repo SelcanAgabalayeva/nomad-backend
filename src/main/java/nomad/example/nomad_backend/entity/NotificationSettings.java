@@ -73,5 +73,16 @@ public class NotificationSettings {
 
     // 1,3,7 gün əvvəl
     private Integer deadlineReminderDays;
+    @ElementCollection
+    @CollectionTable(
+            name = "notification_project_types",
+            joinColumns = @JoinColumn(name = "notification_settings_id")
+    )
+    @Column(name = "project_type")
+    private Set<String> projectTypes = new HashSet<>();
+
+
+    private String duration;
+
 
 }

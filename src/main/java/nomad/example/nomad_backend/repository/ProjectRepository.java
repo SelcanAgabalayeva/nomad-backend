@@ -21,4 +21,5 @@ public interface ProjectRepository extends JpaRepository<UserProject, Long> {
 
     void deleteByUser(User user);
 
+    List<UserProject> findByOpportunityIdAndStatus(Long opportunityId, ProjectStatus status);
 }

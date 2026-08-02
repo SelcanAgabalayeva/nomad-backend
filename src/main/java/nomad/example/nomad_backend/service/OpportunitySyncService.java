@@ -25,6 +25,18 @@ public class OpportunitySyncService {
                 ? row.get(index).toString().trim()
                 : "";
     }
+    private boolean isChanged(String a, String b) {
+
+        if (a == null && b == null) {
+            return false;
+        }
+
+        if (a == null || b == null) {
+            return true;
+        }
+
+        return !a.equalsIgnoreCase(b);
+    }
     @Scheduled(fixedRate = 60000)
     public void sync() throws Exception {
 
@@ -87,15 +99,6 @@ public class OpportunitySyncService {
             String uniqueKey = title + "_" + deadline;
             sheetKeys.add(uniqueKey);
 
-            boolean isNew = opportunityRepository
-                    .findByUniqueKey(uniqueKey)
-                    .isEmpty();
-
-            Opportunity opportunity = opportunityRepository
-                    .findByUniqueKey(uniqueKey)
-                    .orElse(new Opportunity());
-
-
             DateTimeFormatter formatter =
                     DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -106,6 +109,30 @@ public class OpportunitySyncService {
 
                 deadlineDate = LocalDate.parse(deadline, formatter);
             }
+
+
+            Opportunity oldOpportunity =
+                    opportunityRepository.findByUniqueKey(uniqueKey)
+                            .orElse(null);
+
+            boolean isNew = oldOpportunity == null;
+
+            Opportunity opportunity =
+                    isNew ? new Opportunity() : oldOpportunity;
+            boolean changed = false;
+
+            if (oldOpportunity != null) {
+
+                changed =
+                        !java.util.Objects.equals(
+                                oldOpportunity.getDeadline(),
+                                deadlineDate
+                        )
+                                || isChanged(oldOpportunity.getCategory(), category)
+                                || isChanged(oldOpportunity.getCountry(), country)
+                                || isChanged(oldOpportunity.getTitle(), title);
+            }
+
 
 
             opportunity.setTitle(title);
@@ -157,7 +184,17 @@ public class OpportunitySyncService {
 
 
             if (isNew) {
-                notificationService.notifyInterestedUsers(savedOpportunity);
+
+                notificationService.notifyInterestedUsers(
+                        savedOpportunity
+                );
+
+            } else if (changed) {
+
+                notificationService.notifySavedProjectChanges(
+                        savedOpportunity
+                );
+
             }
 
         }

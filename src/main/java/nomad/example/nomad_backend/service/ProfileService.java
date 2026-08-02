@@ -1,5 +1,6 @@
 package nomad.example.nomad_backend.service;
 
+import nomad.example.nomad_backend.dtos.CompleteProfileRequest;
 import nomad.example.nomad_backend.dtos.ProfileResponse;
 import nomad.example.nomad_backend.dtos.UpdateProfileRequest;
 import nomad.example.nomad_backend.dtos.UserResponseDto;
@@ -19,7 +20,7 @@ public interface ProfileService {
 
 
     ProfileResponse updateProfile(Long userId, UpdateProfileRequest request);
-    void completeProfile(Long id);
+    void completeProfile(Long id, CompleteProfileRequest request);
 
     NotificationSettings getPreferences(Long id);
 }

@@ -1,6 +1,7 @@
 package nomad.example.nomad_backend.service.impls;
 
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.CompleteProfileRequest;
 import nomad.example.nomad_backend.dtos.ProfileResponse;
 import nomad.example.nomad_backend.dtos.UpdateProfileRequest;
 import nomad.example.nomad_backend.dtos.UserResponseDto;
@@ -132,10 +133,34 @@ public class ProfileServiceImpl
     }
 
     @Override
-    public void completeProfile(Long id){
+    @Transactional
+    public void completeProfile(Long id, CompleteProfileRequest request) {
 
-        User user=userRepository.findById(id)
-                .orElseThrow();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPhoneNumber(request.getPhoneNumber());
+
+        user.setBirthDate(request.getBirthDate());
+
+        user.setUniversity(request.getUniversity());
+        user.setMajor(request.getMajor());
+
+        user.setEducationLevel(request.getEducationLevel());
+
+        user.setCountry(request.getCountry());
+        user.setCity(request.getCity());
+
+        user.setBio(request.getBio());
+
+        user.setNewsletter(request.isNewsletter());
+
+        // maraq sahələri
+        if (request.getInterests() != null) {
+            user.setInterests(request.getInterests());
+        }
 
         user.setProfileCompleted(true);
 

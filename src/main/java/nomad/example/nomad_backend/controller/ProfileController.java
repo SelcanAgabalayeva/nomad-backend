@@ -1,6 +1,7 @@
 package nomad.example.nomad_backend.controller;
 
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.CompleteProfileRequest;
 import nomad.example.nomad_backend.dtos.ProfileResponse;
 import nomad.example.nomad_backend.dtos.UpdateProfileRequest;
 import nomad.example.nomad_backend.entity.NotificationSettings;
@@ -42,12 +43,16 @@ public class ProfileController {
     }
     @PostMapping("/complete")
     public ResponseEntity<?> completeProfile(
-            @AuthenticationPrincipal User user){
+            @AuthenticationPrincipal User user,
+            @RequestBody CompleteProfileRequest request) {
 
-        profileService.completeProfile(user.getId());
+        profileService.completeProfile(user.getId(), request);
 
         return ResponseEntity.ok(
-                "Profile completed"
+                Map.of(
+                        "success", true,
+                        "message", "Profile completed successfully"
+                )
         );
     }
 

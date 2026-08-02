@@ -66,7 +66,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/me",
                                 "/api/v1/projects/**",
-                                "/api/v1/wishlist/**"
+                                "/api/v1/wishlist/**",
+                                "/api/profile/**"
                         ).hasAnyRole("USER", "ADMIN")
 
                         .requestMatchers(

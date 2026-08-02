@@ -21,9 +21,17 @@ public class EmailService {
         SimpleMailMessage message = new SimpleMailMessage();
 
         message.setTo(email);
-        message.setSubject("Project Deadline Reminder");
+
+        message.setSubject(
+                "Elanın son müraciət tarixi yaxınlaşır"
+        );
+
         message.setText(
-                "Your saved project \"" + title + "\" has a deadline tomorrow."
+                "Salam!\n\n" +
+                        "Saxladığınız elan üçün son müraciət tarixi sabahdır:\n\n" +
+                        title +
+                        "\n\nGecikmədən müraciət etməyi unutmayın.\n\n" +
+                        "Nomad Youth komandası"
         );
 
         mailSender.send(message);

@@ -13,6 +13,7 @@ import java.util.Set;
 public class NotificationSettingsResponseDto {
 
 
+    // Bildiriş kanalları
     private boolean emailNotifications;
 
     private boolean inAppNotifications;
@@ -24,15 +25,17 @@ public class NotificationSettingsResponseDto {
     private boolean savedProjectChanges;
 
     private boolean platformUpdates;
+
     private Set<String> countries;
+
+    private Set<String> projectTypes;
 
     private Set<String> categories;
 
     private Set<String> formats;
 
-    private Set<String> projectTypes;
-
     private Integer deadlineReminderDays;
 
     private String duration;
+
 }

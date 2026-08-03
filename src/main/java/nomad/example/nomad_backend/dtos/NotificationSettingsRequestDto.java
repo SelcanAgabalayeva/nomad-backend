@@ -14,6 +14,7 @@ public class NotificationSettingsRequestDto {
 
     private boolean inAppNotifications;
 
+
     private boolean newOpportunities;
 
     private boolean deadlineReminders;
@@ -21,15 +22,23 @@ public class NotificationSettingsRequestDto {
     private boolean savedProjectChanges;
 
     private boolean platformUpdates;
+
+
     private Set<String> countries;
 
-    private Set<String> categories;
-
-    private Set<String> formats;
 
     private Set<String> projectTypes;
 
-    private String duration;
+
+    private Set<String> categories;
+
+
+    private Set<String> formats;
+
+
     private Integer deadlineReminderDays;
+
+
+    private String duration;
 
 }

@@ -18,30 +18,29 @@ public class NotificationSettings {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-
-    // Bildiriş kanalları
+    @Builder.Default
     private boolean emailNotifications = true;
 
+    @Builder.Default
     private boolean inAppNotifications = true;
 
-
-    // Bildiriş kateqoriyaları
+    @Builder.Default
     private boolean newOpportunities = true;
 
+    @Builder.Default
     private boolean deadlineReminders = true;
 
+    @Builder.Default
     private boolean savedProjectChanges = true;
 
+    @Builder.Default
     private boolean platformUpdates = true;
 
-
-
-    // İstifadəçinin maraqlandığı ölkələr
+    @Builder.Default
     @ElementCollection
     @CollectionTable(
             name = "notification_countries",
@@ -50,8 +49,7 @@ public class NotificationSettings {
     @Column(name = "country")
     private Set<String> countries = new HashSet<>();
 
-
-    // Kateqoriyalar
+    @Builder.Default
     @ElementCollection
     @CollectionTable(
             name = "notification_categories",
@@ -60,8 +58,7 @@ public class NotificationSettings {
     @Column(name = "category")
     private Set<String> categories = new HashSet<>();
 
-
-    // Online / Offline / Hybrid
+    @Builder.Default
     @ElementCollection
     @CollectionTable(
             name = "notification_formats",
@@ -71,8 +68,8 @@ public class NotificationSettings {
     private Set<String> formats = new HashSet<>();
 
 
-    // 1,3,7 gün əvvəl
     private Integer deadlineReminderDays;
+    @Builder.Default
     @ElementCollection
     @CollectionTable(
             name = "notification_project_types",

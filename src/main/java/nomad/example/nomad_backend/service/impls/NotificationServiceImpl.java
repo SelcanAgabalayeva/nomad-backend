@@ -51,17 +51,24 @@ public class NotificationServiceImpl implements NotificationService {
 
             // Ölkə filteri
             if (!settings.getCountries().isEmpty()
-                    && !settings.getCountries()
-                    .contains(opportunity.getCountry())) {
+                    && settings.getCountries()
+                    .stream()
+                    .noneMatch(country ->
+                            country.equalsIgnoreCase(
+                                    opportunity.getCountry()
+                            ))) {
 
                 continue;
             }
 
-
             // Kateqoriya / mövzu filteri
             if (!settings.getCategories().isEmpty()
-                    && !settings.getCategories()
-                    .contains(opportunity.getCategory())) {
+                    && settings.getCategories()
+                    .stream()
+                    .noneMatch(category ->
+                            category.equalsIgnoreCase(
+                                    opportunity.getCategory()
+                            ))) {
 
                 continue;
             }
@@ -69,17 +76,24 @@ public class NotificationServiceImpl implements NotificationService {
 
             // Format filteri (Online / Offline)
             if (!settings.getFormats().isEmpty()
-                    && !settings.getFormats()
-                    .contains(opportunity.getTypeDetail())) {
+                    && settings.getFormats()
+                    .stream()
+                    .noneMatch(format ->
+                            format.equalsIgnoreCase(
+                                    opportunity.getTypeDetail()
+                            ))) {
 
                 continue;
             }
 
-
             // Layihə növü (ESC, Erasmus+, Internship)
             if (!settings.getProjectTypes().isEmpty()
-                    && !settings.getProjectTypes()
-                    .contains(opportunity.getType())) {
+                    && settings.getProjectTypes()
+                    .stream()
+                    .noneMatch(type ->
+                            type.equalsIgnoreCase(
+                                    opportunity.getType()
+                            ))) {
 
                 continue;
             }

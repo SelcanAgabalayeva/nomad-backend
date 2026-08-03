@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -105,19 +106,30 @@ public class NotificationSettingsServiceImpl implements NotificationSettingsServ
                 request.isPlatformUpdates()
         );
         settings.setCountries(
-                request.getCountries()
+                request.getCountries() == null
+                        ? new HashSet<>()
+                        : request.getCountries()
         );
+
 
         settings.setCategories(
-                request.getCategories()
+                request.getCategories() == null
+                        ? new HashSet<>()
+                        : request.getCategories()
         );
+
 
         settings.setFormats(
-                request.getFormats()
+                request.getFormats() == null
+                        ? new HashSet<>()
+                        : request.getFormats()
         );
 
+
         settings.setProjectTypes(
-                request.getProjectTypes()
+                request.getProjectTypes() == null
+                        ? new HashSet<>()
+                        : request.getProjectTypes()
         );
 
         settings.setDuration(

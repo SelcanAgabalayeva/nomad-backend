@@ -222,7 +222,7 @@ public class ProfileServiceImpl
 
                 .birthDate(user.getBirthDate())
 
-                .bio(user.getBio())
+
 
                 .profileImageUrl(user.getProfileImageUrl())
 

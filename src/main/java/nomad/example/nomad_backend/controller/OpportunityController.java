@@ -26,7 +26,8 @@ public class OpportunityController {
     // məsələdir, bu dəyişikliklə əlaqəli deyiil.
     @GetMapping
     public List<Opportunity> getAll() {
-        return repository.findAll();
+
+        return repository.findAllByActiveTrueOrderByDeadlineAsc();
     }
     @GetMapping("/paged")
     public Page<Opportunity> getAllPaged(
@@ -34,7 +35,7 @@ public class OpportunityController {
             @RequestParam(defaultValue = "15") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return repository.findAll(pageable);
+        return repository.findAllByActiveTrueOrderByDeadlineAsc(pageable);
     }
     @GetMapping("/{id}/details")
     public ResponseEntity<OpportunityDetailResponse> getDetails(

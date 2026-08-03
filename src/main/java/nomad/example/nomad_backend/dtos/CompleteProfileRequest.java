@@ -31,7 +31,6 @@ public class CompleteProfileRequest {
 
     private String city;
 
-    private String bio;
 
     private boolean newsletter;
 }

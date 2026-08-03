@@ -123,7 +123,6 @@ public class ProfileServiceImpl
 
         user.setBirthDate(request.getBirthDate());
 
-        user.setBio(request.getBio());
 
 
         userRepository.save(user);
@@ -158,7 +157,7 @@ public class ProfileServiceImpl
         user.setEducationLevel(request.getEducationLevel());
         user.setCountry(request.getCountry());
         user.setCity(request.getCity());
-        user.setBio(request.getBio());
+
         user.setNewsletter(request.isNewsletter());
 
         if (request.getInterests() != null) {

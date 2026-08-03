@@ -29,5 +29,5 @@ public class UpdateProfileRequest {
 
     private LocalDate birthDate;
 
-    private String bio;
+
 }

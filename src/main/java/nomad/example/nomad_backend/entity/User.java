@@ -78,8 +78,7 @@ public class User {
 
     private String city;
 
-    @Column(columnDefinition = "TEXT")
-    private String bio;
+
 
 }
 

@@ -79,7 +79,8 @@ public class NotificationSettings {
     private Set<String> projectTypes = new HashSet<>();
 
 
-    private String duration;
+    @Enumerated(EnumType.STRING)
+    private DurationType duration;
 
 
 }

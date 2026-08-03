@@ -2,6 +2,7 @@ package nomad.example.nomad_backend.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
+import nomad.example.nomad_backend.entity.DurationType;
 
 import java.util.Set;
 
@@ -39,6 +40,6 @@ public class NotificationSettingsRequestDto {
     private Integer deadlineReminderDays;
 
 
-    private String duration;
+    private DurationType duration;
 
 }

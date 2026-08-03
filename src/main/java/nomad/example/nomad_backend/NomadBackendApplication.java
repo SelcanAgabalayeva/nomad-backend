@@ -25,7 +25,20 @@ public class NomadBackendApplication {
 
 		System.setProperty("MAIL_USERNAME", dotenv.get("MAIL_USERNAME"));
 		System.setProperty("MAIL_PASSWORD", dotenv.get("MAIL_PASSWORD"));
+		System.setProperty(
+				"CLOUDINARY_CLOUD_NAME",
+				dotenv.get("CLOUDINARY_CLOUD_NAME")
+		);
 
+		System.setProperty(
+				"CLOUDINARY_API_KEY",
+				dotenv.get("CLOUDINARY_API_KEY")
+		);
+
+		System.setProperty(
+				"CLOUDINARY_API_SECRET",
+				dotenv.get("CLOUDINARY_API_SECRET")
+		);
 		SpringApplication.run(NomadBackendApplication.class, args);
 	}
 }

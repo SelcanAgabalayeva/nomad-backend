@@ -60,7 +60,8 @@ public class SecurityConfig {
                                 "/oauth2/**",
                                 "/login/**",
                                 "/api/opportunities/**",
-                                "/api/v1/likes/**"
+                                "/api/v1/likes/**",
+                                "/uploads/**"
                         ).permitAll()
 
                         .requestMatchers(

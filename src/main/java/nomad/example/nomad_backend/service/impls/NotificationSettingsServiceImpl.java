@@ -71,9 +71,21 @@ public class NotificationSettingsServiceImpl implements NotificationSettingsServ
 
         NotificationSettings settings =
                 repository.findByUserId(user.getId())
-                        .orElseThrow();
+                        .orElseGet(() -> {
 
+                            NotificationSettings newSettings = new NotificationSettings();
 
+                            newSettings.setUser(user);
+
+                            newSettings.setEmailNotifications(true);
+                            newSettings.setInAppNotifications(true);
+                            newSettings.setNewOpportunities(true);
+                            newSettings.setDeadlineReminders(true);
+                            newSettings.setSavedProjectChanges(true);
+                            newSettings.setPlatformUpdates(true);
+
+                            return repository.save(newSettings);
+                        });
 
         settings.setEmailNotifications(
                 request.isEmailNotifications()

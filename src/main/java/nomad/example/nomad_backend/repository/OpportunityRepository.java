@@ -33,6 +33,9 @@ AND (
     OR LOWER(o.country) LIKE CONCAT('%', LOWER(CAST(:search AS string)), '%')
     OR LOWER(o.typeDetail) LIKE CONCAT('%', LOWER(CAST(:search AS string)), '%')
 )
+ORDER BY 
+CASE WHEN o.deadline IS NULL THEN 1 ELSE 0 END,
+o.deadline ASC
 """)
     List<Opportunity> searchOpportunities(
             @Param("search") String search,

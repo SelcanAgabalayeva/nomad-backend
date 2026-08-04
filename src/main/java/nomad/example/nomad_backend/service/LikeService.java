@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,16 +57,20 @@ public class LikeService {
                         )
                 ));
 
-        UserProject project = projectRepository
-                .findByUser_IdAndOpportunity_Id(userId, opportunityId)
-                .orElseGet(() -> {
-                    UserProject newProject = new UserProject();
-                    newProject.setUser(user);
-                    newProject.setOpportunity(opportunity);
-                    newProject.setStatus(ProjectStatus.SAVED);
-                    return projectRepository.save(newProject);
-                });
+        List<UserProject> existingProjects =
+                projectRepository.findAllByUser_IdAndOpportunity_Id(userId, opportunityId);
 
+        UserProject project;
+
+        if (!existingProjects.isEmpty()) {
+            project = existingProjects.get(0);
+        } else {
+            UserProject newProject = new UserProject();
+            newProject.setUser(user);
+            newProject.setOpportunity(opportunity);
+            newProject.setStatus(ProjectStatus.SAVED);
+            project = projectRepository.save(newProject);
+        }
 
         Like like = likeRepository.findByUserIdAndProjectId(userId, project.getId())
                 .orElseGet(() ->
@@ -99,9 +104,18 @@ public class LikeService {
 
     @Transactional
     public void removeLike(Long userId, Long opportunityId) {
-        projectRepository.findByUser_IdAndOpportunity_Id(userId, opportunityId)
-                .ifPresent(project ->
-                        likeRepository.deleteByUserIdAndProjectId(userId, project.getId())
-                );
+
+        List<UserProject> projects =
+                projectRepository.findAllByUser_IdAndOpportunity_Id(userId, opportunityId);
+
+        if (!projects.isEmpty()) {
+
+            UserProject project = projects.get(0);
+
+            likeRepository.deleteByUserIdAndProjectId(
+                    userId,
+                    project.getId()
+            );
+        }
     }
 }

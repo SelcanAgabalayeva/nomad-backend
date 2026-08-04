@@ -69,24 +69,35 @@ public class ProjectService {
 
 
     public UserProject setProjectStatus(Long userId, Long opportunityId, ProjectStatus status) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Opportunity opportunity = opportunityRepository.findById(opportunityId)
                 .orElseThrow(() -> new RuntimeException(
-                        messageSource.getMessage("project.not.found", null, LocaleContextHolder.getLocale())
+                        messageSource.getMessage(
+                                "project.not.found",
+                                null,
+                                LocaleContextHolder.getLocale()
+                        )
                 ));
 
-        UserProject project = projectRepository.findByUser_IdAndOpportunity_Id(userId, opportunityId)
-                .orElseGet(() -> {
-                    UserProject newProject = new UserProject();
-                    newProject.setUser(user);
-                    newProject.setOpportunity(opportunity);
-                    return newProject;
-                });
+        List<UserProject> existingProjects =
+                projectRepository.findAllByUser_IdAndOpportunity_Id(userId, opportunityId);
+
+        UserProject project;
+
+        if (!existingProjects.isEmpty()) {
+            project = existingProjects.get(0);
+        } else {
+            project = new UserProject();
+            project.setUser(user);
+            project.setOpportunity(opportunity);
+        }
 
         project.setStatus(status);
         project.setUpdatedAt(LocalDateTime.now());
+
         return projectRepository.save(project);
     }
 

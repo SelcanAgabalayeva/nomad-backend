@@ -10,11 +10,13 @@ import lombok.Setter;
 @Builder
 public class AuthResponseDto {
 
-
+    private boolean success;
     private String accessToken;
 
     private String refreshToken;
+    private UserResponseDto user;
 
+    private long expiresIn;
     private String message;
 }
 

@@ -232,6 +232,86 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Transactional(noRollbackFor = UnauthorizedException.class)
+    @Override
+    public AuthResponseDto refreshToken(
+            RefreshTokenRequestDto request
+    ) {
+
+        RefreshToken oldToken =
+                refreshTokenRepository
+                        .findByToken(request.getRefreshToken())
+                        .orElseThrow(() ->
+                                new UnauthorizedException(
+                                        "Invalid refresh token"
+                                )
+                        );
+
+
+        if (oldToken.getExpiresAt()
+                .isBefore(LocalDateTime.now())) {
+
+
+            refreshTokenRepository.deleteByToken(
+                    oldToken.getToken()
+            );
+
+            refreshTokenRepository.flush();
+
+
+            throw new UnauthorizedException(
+                    "Refresh token expired"
+            );
+        }
+
+
+        User user = oldToken.getUser();
+
+
+        String accessToken =
+                jwtService.generateToken(user);
+
+
+        refreshTokenRepository.deleteByToken(
+                oldToken.getToken()
+        );
+
+
+        String newRefreshToken =
+                generateRefreshToken();
+
+
+        RefreshToken token =
+                RefreshToken.builder()
+                        .user(user)
+                        .token(newRefreshToken)
+                        .createdAt(LocalDateTime.now())
+                        .expiresAt(
+                                LocalDateTime.now()
+                                        .plusDays(7)
+                        )
+                        .build();
+
+
+        refreshTokenRepository.save(token);
+
+
+        UserResponseDto userDto =
+                modelMapper.map(
+                        user,
+                        UserResponseDto.class
+                );
+
+
+        return AuthResponseDto.builder()
+                .success(true)
+                .message("Token refreshed successfully")
+                .user(userDto)
+                .accessToken(accessToken)
+                .refreshToken(newRefreshToken)
+                .expiresIn(900)
+                .build();
+    }
 
     @Transactional
     @Override

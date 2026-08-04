@@ -1,7 +1,9 @@
 package nomad.example.nomad_backend.service;
 
 
+import jakarta.validation.Valid;
 import nomad.example.nomad_backend.dtos.*;
+import org.jspecify.annotations.Nullable;
 
 public interface AuthService {
     AuthResponseDto register(RegisterRequestDto request);
@@ -14,4 +16,6 @@ public interface AuthService {
     void verifyEmail(String token);
 
     void resendVerificationEmail(String email);
+
+    AuthResponseDto refreshToken(RefreshTokenRequestDto request);
 }

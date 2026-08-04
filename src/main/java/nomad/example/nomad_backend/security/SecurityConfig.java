@@ -53,6 +53,7 @@ public class SecurityConfig {
                                 "/",
                                 "/api/auth/register",
                                 "/api/auth/login",
+                                "/api/auth/refresh-token",
                                 "/api/auth/google",
                                 "/api/auth/verify-email",
                                 "/api/auth/resend-verification",

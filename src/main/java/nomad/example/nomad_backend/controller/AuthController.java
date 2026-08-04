@@ -61,6 +61,16 @@ public class AuthController {
         );
 
     }
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponseDto> refreshToken(
+            @Valid
+            @RequestBody
+            RefreshTokenRequestDto request
+    ){
+        return ResponseEntity.ok(
+                authService.refreshToken(request)
+        );
+    }
 
     @PostMapping("/google")
     public ResponseEntity<LoginResponseDto> loginWithGoogle(

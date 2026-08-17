@@ -25,7 +25,7 @@ WHERE o.active = true
 AND (:category IS NULL OR o.category = :category)
 AND (
     :format IS NULL
-    OR LOWER(o.typeDetail) LIKE CONCAT('%', LOWER(CAST(:format AS string)), '%')
+    OR LOWER(TRIM(o.typeDetail)) = LOWER(TRIM(:format))
 )
 AND (
     :search IS NULL

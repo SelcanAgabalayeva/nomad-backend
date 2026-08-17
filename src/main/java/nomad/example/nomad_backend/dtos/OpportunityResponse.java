@@ -28,6 +28,8 @@ public class OpportunityResponse {
     private String eventDateRange;
     private LocalDate deadline;
     private String type;
+    private String typeDetail;
+    private String escOrSalto;
     private String category;
     private String applyLink;
 }

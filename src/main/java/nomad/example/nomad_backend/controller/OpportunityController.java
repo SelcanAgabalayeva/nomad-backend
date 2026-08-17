@@ -84,7 +84,7 @@ public class OpportunityController {
                         .city(opportunity.getCity())
                         .eventDateRange(opportunity.getEventDateRange())
                         .duration(opportunity.getDuration())
-
+                        .escOrSalto(opportunity.getEscOrSalto())
                         .durationType(
                                 durationTypeService.determine(
                                         opportunity.getDuration()
@@ -99,6 +99,7 @@ public class OpportunityController {
 
                         .deadline(opportunity.getDeadline())
                         .type(opportunity.getType())
+                        .typeDetail(opportunity.getTypeDetail())
                         .category(opportunity.getCategory())
                         .applyLink(opportunity.getApplyLink())
 

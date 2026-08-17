@@ -32,4 +32,5 @@ public class OpportunityResponse {
     private String escOrSalto;
     private String category;
     private String applyLink;
+    private String volunteeringType;
 }

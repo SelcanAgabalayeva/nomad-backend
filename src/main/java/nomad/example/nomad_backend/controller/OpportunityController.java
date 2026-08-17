@@ -72,41 +72,41 @@ public class OpportunityController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size
     ) {
-
         Pageable pageable = PageRequest.of(page, size);
 
         return repository
                 .findAllByActiveTrueOrderByDeadlineAsc(pageable)
-                .map(opportunity -> OpportunityResponse.builder()
-                        .id(opportunity.getId())
-                        .title(opportunity.getTitle())
-                        .country(opportunity.getCountry())
-                        .city(opportunity.getCity())
-                        .eventDateRange(opportunity.getEventDateRange())
-                        .duration(opportunity.getDuration())
-                        .escOrSalto(opportunity.getEscOrSalto())
-                        .durationType(
-                                durationTypeService.determine(
-                                        opportunity.getDuration()
-                                )
-                        )
+                .map(opportunity -> {
+                    // "Hamısı" gələrsə null-a çeviririk ki, frontend-də tag kimi çıxmasın
+                    String typeDetail = opportunity.getTypeDetail();
+                    if ("Hamısı".equalsIgnoreCase(typeDetail) || "Hamisi".equalsIgnoreCase(typeDetail)) {
+                        typeDetail = null;
+                    }
 
-                        .visaType(
-                                visaService.determine(
-                                        opportunity.getCountry()
-                                )
-                        )
+                    // ESC/SALTO böyük hərflə standartlaşdırılır
+                    String escOrSalto = opportunity.getEscOrSalto() != null
+                            ? opportunity.getEscOrSalto().trim().toUpperCase()
+                            : null;
 
-                        .deadline(opportunity.getDeadline())
-                        .type(opportunity.getType())
-                        .typeDetail(opportunity.getTypeDetail())
-                        .category(opportunity.getCategory())
-                        .applyLink(opportunity.getApplyLink())
-
-                        .build()
-                );
+                    return OpportunityResponse.builder()
+                            .id(opportunity.getId())
+                            .title(opportunity.getTitle())
+                            .country(opportunity.getCountry())
+                            .city(opportunity.getCity())
+                            .eventDateRange(opportunity.getEventDateRange())
+                            .duration(opportunity.getDuration())
+                            .escOrSalto(escOrSalto)
+                            .volunteeringType(opportunity.getVolunteeringType()) // <-- Mapper-ə əlavə edin
+                            .durationType(durationTypeService.determine(opportunity.getDuration()))
+                            .visaType(visaService.determine(opportunity.getCountry()))
+                            .deadline(opportunity.getDeadline())
+                            .type(opportunity.getType())
+                            .typeDetail(typeDetail)
+                            .category(opportunity.getCategory())
+                            .applyLink(opportunity.getApplyLink())
+                            .build();
+                });
     }
-
 
     @GetMapping("/{id}/details")
     public ResponseEntity<OpportunityDetailResponse> getDetails(
@@ -136,14 +136,40 @@ public class OpportunityController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String format
     ) {
+        // Format parametrini normalize edirik
+        String normalizedFormat = normalizeFormat(format);
 
         return ResponseEntity.ok(
                 projectService.getAllOpportunitiesForCards(
                         userId,
                         search,
                         category,
-                        format
+                        normalizedFormat
                 )
         );
+    }
+
+    private String normalizeFormat(String format) {
+        if (format == null || format.isBlank()) {
+            return null;
+        }
+
+        String trimmed = format.trim().toLowerCase();
+
+        // "Hamısı" seçildikdə null qaytarırıq ki, JPQL filtri sıfırlasın
+        if (trimmed.equals("hamısı") || trimmed.equals("hamisi") || trimmed.equals("all")) {
+            return null;
+        }
+
+        // Azerbaycan dilində gələn dəyərləri DB-dəki "Online" / "Offline" ilə üst-üstə salırıq
+        if (trimmed.equals("onlayn") || trimmed.equals("online")) {
+            return "Online";
+        }
+
+        if (trimmed.equals("əyani") || trimmed.equals("eyani") || trimmed.equals("offline")) {
+            return "Offline";
+        }
+
+        return format;
     }
 }

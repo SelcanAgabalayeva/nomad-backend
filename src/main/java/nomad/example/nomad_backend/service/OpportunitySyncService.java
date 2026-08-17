@@ -38,6 +38,7 @@ public class OpportunitySyncService {
         return !a.equalsIgnoreCase(b);
     }
     @Scheduled(fixedRate = 60000)
+
     public void sync() throws Exception {
 
         System.out.println("SYNC STARTED");
@@ -124,15 +125,22 @@ public class OpportunitySyncService {
             if (oldOpportunity != null) {
 
                 changed =
-                        !java.util.Objects.equals(
-                                oldOpportunity.getDeadline(),
-                                deadlineDate
-                        )
+                        !java.util.Objects.equals(oldOpportunity.getDeadline(), deadlineDate)
                                 || isChanged(oldOpportunity.getCategory(), category)
                                 || isChanged(oldOpportunity.getCountry(), country)
-                                || isChanged(oldOpportunity.getTitle(), title);
+                                || isChanged(oldOpportunity.getTitle(), title)
+                                || isChanged(oldOpportunity.getCity(), city)
+                                || isChanged(oldOpportunity.getDuration(), duration)
+                                || isChanged(oldOpportunity.getLanguage(), language)
+                                || isChanged(oldOpportunity.getType(), type)
+                                || isChanged(oldOpportunity.getTypeDetail(), typeDetail)
+                                || isChanged(oldOpportunity.getApplyLink(), applyLink)
+                                || isChanged(oldOpportunity.getVolunteeringType(), volunteeringType)
+                                || isChanged(oldOpportunity.getAgeRequirement(), ageRequirement)
+                                || isChanged(oldOpportunity.getFinancialSupport(), financialSupport)
+                                || isChanged(oldOpportunity.getEventDateRange(), eventDateRange)
+                                || isChanged(oldOpportunity.getEscOrSalto(), escOrSalto);
             }
-
 
 
             opportunity.setTitle(title);
@@ -185,15 +193,19 @@ public class OpportunitySyncService {
 
             if (isNew) {
 
-                notificationService.notifyInterestedUsers(
-                        savedOpportunity
-                );
+                try {
+                    notificationService.notifyInterestedUsers(savedOpportunity);
+                } catch (Exception e) {
+                    System.out.println("Notification error: " + e.getMessage());
+                }
 
             } else if (changed) {
 
-                notificationService.notifySavedProjectChanges(
-                        savedOpportunity
-                );
+                try {
+                    notificationService.notifySavedProjectChanges(savedOpportunity);
+                } catch (Exception e) {
+                    System.out.println("Notification error: " + e.getMessage());
+                }
 
             }
 

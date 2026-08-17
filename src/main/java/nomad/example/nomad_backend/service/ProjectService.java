@@ -226,10 +226,9 @@ public class ProjectService {
                 .applyLink(opp.getApplyLink())
                 .isSaved(isSaved)
                 .isApplied(isApplied)
-
                 .duration(opp.getDuration())
                 .language(opp.getLanguage())
-                .eventDateRange(opp.getEventDateRange())
+
                 .durationType(
                         durationTypeService.determine(
                                 opp.getDuration()
@@ -242,7 +241,6 @@ public class ProjectService {
                         )
                 )
                 .financialSupport(opp.getFinancialSupport())
-                .city(opp.getCity())
                 .volunteeringType(opp.getVolunteeringType())
                 .ageRequirement(opp.getAgeRequirement())
                 .escOrSalto(opp.getEscOrSalto())

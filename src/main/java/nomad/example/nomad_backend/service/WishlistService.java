@@ -11,6 +11,8 @@ import nomad.example.nomad_backend.repository.OpportunityRepository;
 import nomad.example.nomad_backend.repository.ProjectRepository;
 import nomad.example.nomad_backend.repository.UserRepository;
 import nomad.example.nomad_backend.repository.WishlistRepository;
+import nomad.example.nomad_backend.service.impls.DurationTypeService;
+import nomad.example.nomad_backend.service.impls.VisaService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -27,15 +29,19 @@ public class WishlistService {
     private final ProjectRepository projectRepository;
     private final OpportunityRepository opportunityRepository;
     private final MessageSource messageSource;
+    private final DurationTypeService durationTypeService;
+    private final VisaService visaService;
 
     public WishlistService(WishlistRepository wishlistRepository, UserRepository userRepository,
                            ProjectRepository projectRepository, OpportunityRepository opportunityRepository,
-                           MessageSource messageSource) {
+                           MessageSource messageSource, DurationTypeService durationTypeService, VisaService visaService) {
         this.wishlistRepository = wishlistRepository;
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.opportunityRepository = opportunityRepository;
         this.messageSource = messageSource;
+        this.durationTypeService = durationTypeService;
+        this.visaService = visaService;
     }
 
     // DÜZƏLDİLDİ: "projectId" parametri əslində frontend-dən gələn
@@ -89,15 +95,32 @@ public class WishlistService {
         return new WishlistResponse(
                 wishlist.getId(),
                 wishlist.getCreatedAt(),
-                new OpportunityResponse(
-                        opportunity.getId(),
-                        opportunity.getTitle(),
-                        opportunity.getCountry(),
-                        opportunity.getDeadline(),
-                        opportunity.getType(),
-                        opportunity.getCategory(),
-                        opportunity.getApplyLink()
-                )
+
+                OpportunityResponse.builder()
+                        .id(opportunity.getId())
+                        .title(opportunity.getTitle())
+                        .country(opportunity.getCountry())
+
+                        .duration(opportunity.getDuration())
+
+                        .durationType(
+                                durationTypeService.determine(
+                                        opportunity.getDuration()
+                                )
+                        )
+
+                        .visaType(
+                                visaService.determine(
+                                        opportunity.getCountry()
+                                )
+                        )
+
+                        .deadline(opportunity.getDeadline())
+                        .type(opportunity.getType())
+                        .category(opportunity.getCategory())
+                        .applyLink(opportunity.getApplyLink())
+
+                        .build()
         );
     }
     public List<UserProject> getUserWishlist(Long userId) {

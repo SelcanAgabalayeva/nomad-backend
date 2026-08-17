@@ -11,6 +11,8 @@ import nomad.example.nomad_backend.entity.ProjectStatus;
 import nomad.example.nomad_backend.repository.OpportunityRepository;
 import nomad.example.nomad_backend.repository.ProjectRepository;
 import nomad.example.nomad_backend.repository.UserRepository;
+import nomad.example.nomad_backend.service.impls.DurationTypeService;
+import nomad.example.nomad_backend.service.impls.VisaService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,13 +33,17 @@ public class ProjectService {
     private final MessageSource messageSource;
     private final OpportunityRepository opportunityRepository;
     private final UserRepository userRepository;
+    private final DurationTypeService durationTypeService;
+    private final VisaService visaService;
 
     public ProjectService(ProjectRepository projectRepository, MessageSource messageSource,
-                          OpportunityRepository opportunityRepository, UserRepository userRepository) {
+                          OpportunityRepository opportunityRepository, UserRepository userRepository, DurationTypeService durationTypeService, VisaService visaService) {
         this.projectRepository = projectRepository;
         this.messageSource = messageSource;
         this.opportunityRepository = opportunityRepository;
         this.userRepository = userRepository;
+        this.durationTypeService = durationTypeService;
+        this.visaService = visaService;
     }
 
     public List<UserProject> getSavedProjects() {
@@ -107,6 +113,7 @@ public class ProjectService {
                 opportunityRepository.findByActiveTrue();
 
         Map<Long, ProjectStatus> userProjectStatusMap = java.util.Collections.emptyMap();
+
         if (userId != null) {
             userProjectStatusMap = projectRepository.findByUserId(userId).stream()
                     .collect(Collectors.toMap(
@@ -119,13 +126,22 @@ public class ProjectService {
         Map<Long, ProjectStatus> finalMap = userProjectStatusMap;
 
         return opportunities.stream().map(opp -> {
+
             long daysLeft = 0;
+
             if (opp.getDeadline() != null) {
-                daysLeft = ChronoUnit.DAYS.between(LocalDate.now(), opp.getDeadline());
-                if (daysLeft < 0) daysLeft = 0;
+                daysLeft = ChronoUnit.DAYS.between(
+                        LocalDate.now(),
+                        opp.getDeadline()
+                );
+
+                if (daysLeft < 0) {
+                    daysLeft = 0;
+                }
             }
 
             ProjectStatus status = finalMap.get(opp.getId());
+
             boolean isSaved = status == ProjectStatus.SAVED;
             boolean isApplied = status == ProjectStatus.APPLIED;
 
@@ -138,10 +154,31 @@ public class ProjectService {
                     .typeDetail(opp.getTypeDetail())
                     .deadline(opp.getDeadline())
                     .openingDate(opp.getOpeningDate())
+                    .applyLink(opp.getApplyLink())
                     .daysLeft(daysLeft)
+
                     .isSaved(isSaved)
                     .isApplied(isApplied)
+
+                    .escOrSalto(opp.getEscOrSalto())
+                    .volunteeringType(opp.getVolunteeringType())
+
+                    .duration(opp.getDuration())
+
+                    .durationType(
+                            durationTypeService.determine(
+                                    opp.getDuration()
+                            )
+                    )
+
+                    .visaType(
+                            visaService.determine(
+                                    opp.getCountry()
+                            )
+                    )
+
                     .build();
+
         }).collect(Collectors.toList());
     }
 
@@ -188,6 +225,17 @@ public class ProjectService {
                 .duration(opp.getDuration())
                 .language(opp.getLanguage())
                 .eventDateRange(opp.getEventDateRange())
+                .durationType(
+                        durationTypeService.determine(
+                                opp.getDuration()
+                        )
+                )
+
+                .visaType(
+                        visaService.determine(
+                                opp.getCountry()
+                        )
+                )
                 .financialSupport(opp.getFinancialSupport())
                 .city(opp.getCity())
                 .volunteeringType(opp.getVolunteeringType())
@@ -274,6 +322,14 @@ public class ProjectService {
                     .isApplied(isApplied)
                     .escOrSalto(opp.getEscOrSalto())
                     .volunteeringType(opp.getVolunteeringType())
+
+                    .duration(opp.getDuration())
+                    .durationType(
+                            durationTypeService.determine(opp.getDuration())
+                    )
+                    .visaType(
+                            visaService.determine(opp.getCountry())
+                    )
                     .build();
         }).collect(Collectors.toList());
     }

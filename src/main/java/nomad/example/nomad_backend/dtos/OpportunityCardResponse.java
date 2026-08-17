@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nomad.example.nomad_backend.entity.DurationType;
+import nomad.example.nomad_backend.entity.VisaType;
 
 import java.time.LocalDate;
 
@@ -28,5 +30,8 @@ public class OpportunityCardResponse {
     private String escOrSalto;
     private String volunteeringType;
     private String applyLink;
+    private String duration;
+    private DurationType durationType;
+    private VisaType visaType;
 
 }

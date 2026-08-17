@@ -71,21 +71,24 @@ public class OpportunityController {
     @GetMapping("/paged")
     public Page<OpportunityResponse> getAllPaged(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "15") int size
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false) String format // <-- 1. Parametri bura əlavə edin
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
+        // 2. Frontend-dən gələn "Onlayn"/"Əyani" sözünü "Online"/"Offline"-a çeviririk
+        String normalizedFormat = normalizeFormat(format);
+
+        // 3. Bazadan bütün datanı yox, FİLTRLƏNMİŞ datanı çəkirik:
         return repository
-                .findAllByActiveTrueOrderByDeadlineAsc(pageable)
+                .findAllByFormat(normalizedFormat, pageable)
                 .map(opportunity -> {
-                    // FRONTEND HİYLƏSİ: null və ya "Hamısı" gələrsə "" (boş sətir) edirik
-                    // Bu zaman JS-dəki `raw.typeDetail ?? "Hamısı"` işə düşməyəcək və tag itəcək
+
                     String typeDetail = opportunity.getTypeDetail();
                     if (typeDetail == null || "Hamısı".equalsIgnoreCase(typeDetail) || "Hamisi".equalsIgnoreCase(typeDetail)) {
                         typeDetail = "";
                     }
 
-                    // ESC/SALTO böyük hərflə standartlaşdırılır ki, JS-dəki 'ESC' === 'ESC' şərti ödənsin
                     String escOrSalto = opportunity.getEscOrSalto() != null
                             ? opportunity.getEscOrSalto().trim().toUpperCase()
                             : null;
@@ -103,7 +106,7 @@ public class OpportunityController {
                             .visaType(visaService.determine(opportunity.getCountry()))
                             .deadline(opportunity.getDeadline())
                             .type(opportunity.getType())
-                            .typeDetail(typeDetail) // Boş string kimi gedəcək
+                            .typeDetail(typeDetail)
                             .category(opportunity.getCategory())
                             .applyLink(opportunity.getApplyLink())
                             .build();

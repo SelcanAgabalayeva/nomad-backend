@@ -33,41 +33,49 @@ public class OpportunityController {
 
 
     @GetMapping
-    public List<OpportunityResponse> getAll() {
+    public List<OpportunityResponse> getAll(@RequestParam(required = false) String format) {
+
+        String normalizedFormat = normalizeFormat(format);
 
         return repository.findAllByActiveTrueOrderByDeadlineAsc()
                 .stream()
-                .map(opportunity -> OpportunityResponse.builder()
-                        .id(opportunity.getId())
-                        .title(opportunity.getTitle())
-                        .country(opportunity.getCountry())
-                        .city(opportunity.getCity())
-                        .duration(opportunity.getDuration())
-                        .eventDateRange(opportunity.getEventDateRange())
+                .filter(o -> {
+                    if (normalizedFormat == null) return true;
+                    return o.getTypeDetail() != null && o.getTypeDetail().equalsIgnoreCase(normalizedFormat);
+                })
+                .map(opportunity -> {
 
-                        .durationType(
-                                durationTypeService.determine(
-                                        opportunity.getDuration()
-                                )
-                        )
+                    // 1. typeDetail üçün FRONTEND HİYLƏSİ (null əvəzinə "" göndəririk)
+                    String typeDetail = opportunity.getTypeDetail();
+                    if (typeDetail == null || "Hamısı".equalsIgnoreCase(typeDetail) || "Hamisi".equalsIgnoreCase(typeDetail)) {
+                        typeDetail = "";
+                    }
 
-                        .visaType(
-                                visaService.determine(
-                                        opportunity.getCountry()
-                                )
-                        )
+                    // 2. ESC/SALTO boyuk harfle
+                    String escOrSalto = opportunity.getEscOrSalto() != null
+                            ? opportunity.getEscOrSalto().trim().toUpperCase()
+                            : null;
 
-                        .deadline(opportunity.getDeadline())
-                        .type(opportunity.getType())
-                        .category(opportunity.getCategory())
-                        .applyLink(opportunity.getApplyLink())
-
-                        .build()
-                )
+                    return OpportunityResponse.builder()
+                            .id(opportunity.getId())
+                            .title(opportunity.getTitle())
+                            .country(opportunity.getCountry())
+                            .city(opportunity.getCity())
+                            .duration(opportunity.getDuration())
+                            .eventDateRange(opportunity.getEventDateRange())
+                            .durationType(durationTypeService.determine(opportunity.getDuration()))
+                            .visaType(visaService.determine(opportunity.getCountry()))
+                            .deadline(opportunity.getDeadline())
+                            .type(opportunity.getType())
+                            .typeDetail(typeDetail) // Sahə əlavə olundu
+                            .escOrSalto(escOrSalto) // Sahə əlavə olundu
+                            .volunteeringType(opportunity.getVolunteeringType()) // Sahə əlavə olundu
+                            .category(opportunity.getCategory())
+                            .applyLink(opportunity.getApplyLink())
+                            .build();
+                })
                 .toList();
     }
-
-
     @GetMapping("/paged")
     public Page<OpportunityResponse> getAllPaged(
             @RequestParam(defaultValue = "0") int page,

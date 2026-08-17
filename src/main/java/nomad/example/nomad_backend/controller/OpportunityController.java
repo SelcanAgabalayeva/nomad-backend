@@ -40,7 +40,7 @@ public class OpportunityController {
                         .id(opportunity.getId())
                         .title(opportunity.getTitle())
                         .country(opportunity.getCountry())
-
+                        .city(opportunity.getCity())
                         .duration(opportunity.getDuration())
 
                         .durationType(

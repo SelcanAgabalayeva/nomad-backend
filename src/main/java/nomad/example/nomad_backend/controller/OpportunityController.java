@@ -31,6 +31,7 @@ public class OpportunityController {
     private final VisaService visaService;
 
 
+
     @GetMapping
     public List<OpportunityResponse> getAll() {
 
@@ -77,13 +78,14 @@ public class OpportunityController {
         return repository
                 .findAllByActiveTrueOrderByDeadlineAsc(pageable)
                 .map(opportunity -> {
-                    // "Hamısı" gələrsə null-a çeviririk ki, frontend-də tag kimi çıxmasın
+                    // FRONTEND HİYLƏSİ: null və ya "Hamısı" gələrsə "" (boş sətir) edirik
+                    // Bu zaman JS-dəki `raw.typeDetail ?? "Hamısı"` işə düşməyəcək və tag itəcək
                     String typeDetail = opportunity.getTypeDetail();
-                    if ("Hamısı".equalsIgnoreCase(typeDetail) || "Hamisi".equalsIgnoreCase(typeDetail)) {
-                        typeDetail = null;
+                    if (typeDetail == null || "Hamısı".equalsIgnoreCase(typeDetail) || "Hamisi".equalsIgnoreCase(typeDetail)) {
+                        typeDetail = "";
                     }
 
-                    // ESC/SALTO böyük hərflə standartlaşdırılır
+                    // ESC/SALTO böyük hərflə standartlaşdırılır ki, JS-dəki 'ESC' === 'ESC' şərti ödənsin
                     String escOrSalto = opportunity.getEscOrSalto() != null
                             ? opportunity.getEscOrSalto().trim().toUpperCase()
                             : null;
@@ -96,12 +98,12 @@ public class OpportunityController {
                             .eventDateRange(opportunity.getEventDateRange())
                             .duration(opportunity.getDuration())
                             .escOrSalto(escOrSalto)
-                            .volunteeringType(opportunity.getVolunteeringType()) // <-- Mapper-ə əlavə edin
+                            .volunteeringType(opportunity.getVolunteeringType())
                             .durationType(durationTypeService.determine(opportunity.getDuration()))
                             .visaType(visaService.determine(opportunity.getCountry()))
                             .deadline(opportunity.getDeadline())
                             .type(opportunity.getType())
-                            .typeDetail(typeDetail)
+                            .typeDetail(typeDetail) // Boş string kimi gedəcək
                             .category(opportunity.getCategory())
                             .applyLink(opportunity.getApplyLink())
                             .build();

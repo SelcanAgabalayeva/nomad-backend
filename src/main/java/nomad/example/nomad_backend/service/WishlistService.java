@@ -101,6 +101,7 @@ public class WishlistService {
                         .title(opportunity.getTitle())
                         .country(opportunity.getCountry())
 
+                        .city(opportunity.getCity())
                         .duration(opportunity.getDuration())
 
                         .durationType(

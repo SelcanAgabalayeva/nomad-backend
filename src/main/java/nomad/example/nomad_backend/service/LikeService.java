@@ -93,7 +93,7 @@ public class LikeService {
                         .id(opportunity.getId())
                         .title(opportunity.getTitle())
                         .country(opportunity.getCountry())
-
+                        .city(opportunity.getCity())
                         .duration(opportunity.getDuration())
 
                         .durationType(

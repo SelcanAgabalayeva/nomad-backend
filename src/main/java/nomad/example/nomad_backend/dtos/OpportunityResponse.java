@@ -21,7 +21,7 @@ public class OpportunityResponse {
     private String title;
 
     private String country;
-
+    private String city;
     private String duration;
     private DurationType durationType;
     private VisaType visaType;

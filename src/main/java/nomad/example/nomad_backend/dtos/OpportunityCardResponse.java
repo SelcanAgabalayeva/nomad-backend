@@ -23,7 +23,7 @@ public class OpportunityCardResponse {
     private LocalDate deadline;
     private LocalDate openingDate;
     private long daysLeft; // Qalan gün sayı
-
+    private String city;
     // İstifadəçinin bu karta qarşı olan statusu
     private boolean isSaved;   // Şəkildəki bookmark ikonu üçün
     private boolean isApplied; // "Müraciət et" düyməsinin aktiv/passivliyi üçün

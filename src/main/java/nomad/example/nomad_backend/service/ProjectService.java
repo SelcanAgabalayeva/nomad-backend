@@ -155,6 +155,7 @@ public class ProjectService {
                     .typeDetail(opp.getTypeDetail())
                     .deadline(opp.getDeadline())
                     .openingDate(opp.getOpeningDate())
+                    .eventDateRange(opp.getEventDateRange())
                     .applyLink(opp.getApplyLink())
                     .daysLeft(daysLeft)
 
@@ -220,6 +221,7 @@ public class ProjectService {
                 .typeDetail(opp.getTypeDetail())
                 .deadline(opp.getDeadline())
                 .openingDate(opp.getOpeningDate())
+                .eventDateRange(opp.getEventDateRange())
                 .description(description)
                 .applyLink(opp.getApplyLink())
                 .isSaved(isSaved)
@@ -320,6 +322,7 @@ public class ProjectService {
                     .typeDetail(opp.getTypeDetail())
                     .deadline(opp.getDeadline())
                     .openingDate(opp.getOpeningDate())
+                    .eventDateRange(opp.getEventDateRange())
                     .applyLink(opp.getApplyLink())
                     .daysLeft(daysLeft)
                     .isSaved(isSaved)

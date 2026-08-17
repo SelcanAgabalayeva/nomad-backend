@@ -81,6 +81,7 @@ public class OpportunityController {
                         .title(opportunity.getTitle())
                         .country(opportunity.getCountry())
                         .city(opportunity.getCity())
+                        .eventDateRange(opportunity.getEventDateRange())
                         .duration(opportunity.getDuration())
 
                         .durationType(

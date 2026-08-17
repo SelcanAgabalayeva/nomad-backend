@@ -25,7 +25,7 @@ public class OpportunityResponse {
     private String duration;
     private DurationType durationType;
     private VisaType visaType;
-
+    private String eventDateRange;
     private LocalDate deadline;
     private String type;
     private String category;

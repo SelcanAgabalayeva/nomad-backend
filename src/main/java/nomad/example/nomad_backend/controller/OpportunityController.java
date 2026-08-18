@@ -14,6 +14,7 @@ import nomad.example.nomad_backend.service.impls.VisaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,20 +81,44 @@ public class OpportunityController {
     public Page<OpportunityResponse> getAllPaged(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "15") int size,
-            @RequestParam(required = false) String format // <-- 1. Parametri bura əlavə edin
+            @RequestParam(required = false) String format,
+            @RequestParam(defaultValue = "deadline") String sort
     ) {
-        Pageable pageable = PageRequest.of(page, size);
 
-        // 2. Frontend-dən gələn "Onlayn"/"Əyani" sözünü "Online"/"Offline"-a çeviririk
+        // Frontend-dən gələn "Onlayn"/"Əyani" sözünü
+        // "Online"/"Offline"-a çeviririk
         String normalizedFormat = normalizeFormat(format);
 
-        // 3. Bazadan bütün datanı yox, FİLTRLƏNMİŞ datanı çəkirik:
+        Sort sorting;
+
+        switch (sort.toLowerCase()) {
+
+            case "newest":
+                sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                break;
+
+            case "city":
+                sorting = Sort.by(Sort.Direction.ASC, "city");
+                break;
+
+            case "deadline":
+            default:
+                sorting = Sort.by(Sort.Direction.ASC, "deadline");
+                break;
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sorting);
+
+        // Bazadan filter + pagination + sorting ilə datanı çəkirik
         return repository
                 .findAllByFormat(normalizedFormat, pageable)
                 .map(opportunity -> {
 
                     String typeDetail = opportunity.getTypeDetail();
-                    if (typeDetail == null || "Hamısı".equalsIgnoreCase(typeDetail) || "Hamisi".equalsIgnoreCase(typeDetail)) {
+
+                    if (typeDetail == null
+                            || "Hamısı".equalsIgnoreCase(typeDetail)
+                            || "Hamisi".equalsIgnoreCase(typeDetail)) {
                         typeDetail = "";
                     }
 
@@ -110,8 +135,12 @@ public class OpportunityController {
                             .duration(opportunity.getDuration())
                             .escOrSalto(escOrSalto)
                             .volunteeringType(opportunity.getVolunteeringType())
-                            .durationType(durationTypeService.determine(opportunity.getDuration()))
-                            .visaType(visaService.determine(opportunity.getCountry()))
+                            .durationType(
+                                    durationTypeService.determine(opportunity.getDuration())
+                            )
+                            .visaType(
+                                    visaService.determine(opportunity.getCountry())
+                            )
                             .deadline(opportunity.getDeadline())
                             .type(opportunity.getType())
                             .typeDetail(typeDetail)

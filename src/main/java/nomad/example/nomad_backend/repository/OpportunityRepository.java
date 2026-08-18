@@ -43,10 +43,18 @@ o.deadline ASC
             @Param("format") String format
     );
 
-    @Query("SELECT o FROM Opportunity o WHERE " +
-            "(:format IS NULL OR LOWER(TRIM(o.typeDetail)) = LOWER(TRIM(:format))) " +
-            "AND o.active = true ORDER BY o.deadline ASC")
-    Page<Opportunity> findAllByFormat(@Param("format") String format, Pageable pageable);
+    @Query("""
+    SELECT o FROM Opportunity o
+    WHERE o.active = true
+    AND (
+        :format IS NULL
+        OR o.typeDetail = :format
+    )
+""")
+    Page<Opportunity> findAllByFormat(
+            @Param("format") String format,
+            Pageable pageable
+    );
     List<Opportunity> findByActiveTrue();
     Optional<Opportunity> findByIdAndActiveTrue(Long id);
     List<Opportunity> findAllByActiveTrueOrderByDeadlineAsc();

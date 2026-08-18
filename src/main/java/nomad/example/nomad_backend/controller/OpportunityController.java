@@ -94,7 +94,7 @@ public class OpportunityController {
         switch (sort.toLowerCase()) {
 
             case "newest":
-                sorting = Sort.by(Sort.Direction.DESC, "createdAt");
+                sorting = Sort.by(Sort.Direction.DESC, "id");
                 break;
 
             case "city":

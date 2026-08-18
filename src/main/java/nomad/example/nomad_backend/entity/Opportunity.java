@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "opportunities")
@@ -66,6 +67,8 @@ public class Opportunity {
     @Column(length = 1000)
     private String volunteeringType;
     private boolean active = true;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private OpportunityStatus status = OpportunityStatus.READY;

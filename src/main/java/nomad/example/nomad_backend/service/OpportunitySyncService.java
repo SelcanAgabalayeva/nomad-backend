@@ -7,6 +7,7 @@ import nomad.example.nomad_backend.entity.OpportunityStatus;
 import nomad.example.nomad_backend.repository.OpportunityRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -120,6 +121,11 @@ public class OpportunitySyncService {
 
             Opportunity opportunity =
                     isNew ? new Opportunity() : oldOpportunity;
+
+            if (isNew) {
+                opportunity.setCreatedAt(LocalDateTime.now());
+            }
+
             boolean changed = false;
 
             if (oldOpportunity != null) {

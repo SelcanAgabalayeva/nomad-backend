@@ -16,7 +16,11 @@ public class EmailService {
     private final JavaMailSender mailSender;
     private final ContactMessageRepository contactMessageRepository;
 
-    public void sendDeadlineReminder(String email, String title) {
+    public void sendDeadlineReminder(
+            String email,
+            String title,
+            int days
+    ) {
 
         SimpleMailMessage message = new SimpleMailMessage();
 
@@ -26,11 +30,23 @@ public class EmailService {
                 "Elanın son müraciət tarixi yaxınlaşır"
         );
 
+        String dayText;
+
+        if (days == 0) {
+            dayText = "bu gündür";
+        } else if (days == 1) {
+            dayText = "sabahdır";
+        } else {
+            dayText = days + " gün sonra olacaq";
+        }
+
         message.setText(
                 "Salam!\n\n" +
-                        "Saxladığınız elan üçün son müraciət tarixi sabahdır:\n\n" +
+                        "Saxladığınız elanın son müraciət tarixi "
+                        + dayText + ":\n\n" +
                         title +
-                        "\n\nGecikmədən müraciət etməyi unutmayın.\n\n" +
+                        "\n\n" +
+                        "Gecikmədən müraciət etməyi unutmayın.\n\n" +
                         "Nomad Youth komandası"
         );
 

@@ -16,10 +16,15 @@ public class EmailTestController {
     @PostMapping
     public ResponseEntity<String> sendEmail(
             @RequestParam String email,
-            @RequestParam String title
+            @RequestParam String title,
+            @RequestParam int days
     ) {
 
-        emailService.sendDeadlineReminder(email, title);
+        emailService.sendDeadlineReminder(
+                email,
+                title,
+                days
+        );
 
         return ResponseEntity.ok("Email sent");
     }

@@ -62,7 +62,8 @@ public class SecurityConfig {
                                 "/login/**",
                                 "/api/opportunities/**",
                                 "/api/v1/likes/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/api/v1/test-email"
                         ).permitAll()
 
                         .requestMatchers(

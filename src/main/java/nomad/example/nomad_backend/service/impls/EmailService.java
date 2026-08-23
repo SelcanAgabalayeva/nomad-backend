@@ -4,31 +4,43 @@ import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.ContactMessageRequest;
 import nomad.example.nomad_backend.entity.ContactMessage;
 import nomad.example.nomad_backend.repository.ContactMessageRepository;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
     private final ContactMessageRepository contactMessageRepository;
+
+    @Value("${resend.api-key}")
+    private String resendApiKey;
+
+    @Value("${resend.from}")
+    private String resendFrom;
+
+
+    private final RestClient restClient =
+            RestClient.builder()
+                    .baseUrl("https://api.resend.com")
+                    .build();
+
+
+    // =========================================================
+    // DEADLINE REMINDER
+    // =========================================================
 
     public void sendDeadlineReminder(
             String email,
             String title,
             int days
     ) {
-
-        SimpleMailMessage message = new SimpleMailMessage();
-
-        message.setTo(email);
-
-        message.setSubject(
-                "Elanın son müraciət tarixi yaxınlaşır"
-        );
 
         String dayText;
 
@@ -40,89 +52,172 @@ public class EmailService {
             dayText = days + " gün sonra olacaq";
         }
 
-        message.setText(
+
+        String text =
                 "Salam!\n\n" +
                         "Saxladığınız elanın son müraciət tarixi "
                         + dayText + ":\n\n" +
                         title +
                         "\n\n" +
                         "Gecikmədən müraciət etməyi unutmayın.\n\n" +
-                        "Nomad Youth komandası"
-        );
+                        "Nomad Youth komandası";
 
-        mailSender.send(message);
+
+        sendEmail(
+                email,
+                "Elanın son müraciət tarixi yaxınlaşır",
+                text
+        );
     }
 
-    @Transactional
-    public void sendAndSaveContactMessage(ContactMessageRequest request) {
 
+    // =========================================================
+    // EMAIL VERIFICATION
+    // =========================================================
 
-        ContactMessage contactMessage = new ContactMessage();
-        contactMessage.setName(request.getName());
-        contactMessage.setEmail(request.getEmail());
-        contactMessage.setSubject(request.getSubject());
-        contactMessage.setMessage(request.getMessage());
-
-        contactMessageRepository.save(contactMessage); // Bazaya yadda saxlanılır
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("nomadyouth26@gmail.com");
-
-        String subject = (request.getSubject() != null && !request.getSubject().trim().isEmpty())
-                ? request.getSubject()
-                : "Yeni Əlaqə Formu Mesajı";
-        message.setSubject(subject);
-
-        String emailContent = "Kimdən: " + request.getName() + "\n" +
-                "E-poçt: " + request.getEmail() + "\n\n" +
-                "Mesaj:\n" + request.getMessage();
-        message.setText(emailContent);
-        message.setReplyTo(request.getEmail());
-
-        mailSender.send(message);
-    }
-    public void sendVerificationEmail(String email, String token) {
-
-        SimpleMailMessage message = new SimpleMailMessage();
-
-        message.setTo(email);
-
-        message.setSubject(
-                "E-mail təsdiqi"
-        );
+    public void sendVerificationEmail(
+            String email,
+            String token
+    ) {
 
         String verificationLink =
                 "https://nomadyouth.com.az/verify-email?token="
                         + token;
 
 
-        message.setText(
+        String text =
                 "Salam!\n\n" +
                         "Hesabınızı aktivləşdirmək üçün aşağıdakı linkə daxil olun:\n\n" +
                         verificationLink +
-                        "\n\nBu link 24 saat ərzində keçərlidir."
+                        "\n\n" +
+                        "Bu link 24 saat ərzində keçərlidir.";
+
+
+        sendEmail(
+                email,
+                "E-mail təsdiqi",
+                text
         );
-
-
-        mailSender.send(message);
     }
-    public void sendInterestNotification(String email, String title) {
 
-        SimpleMailMessage message = new SimpleMailMessage();
 
-        message.setTo(email);
+    // =========================================================
+    // INTEREST NOTIFICATION
+    // =========================================================
 
-        message.setSubject(
-                "Maraq dairənizə uyğun yeni layihə"
-        );
+    public void sendInterestNotification(
+            String email,
+            String title
+    ) {
 
-        message.setText(
+        String text =
                 "Salam!\n\n" +
                         "Maraq dairənizə uyğun yeni layihə əlavə edildi:\n\n" +
                         title +
-                        "\n\nPlatformaya daxil olaraq ətraflı baxa bilərsiniz."
+                        "\n\n" +
+                        "Platformaya daxil olaraq ətraflı baxa bilərsiniz.";
+
+
+        sendEmail(
+                email,
+                "Maraq dairənizə uyğun yeni layihə",
+                text
+        );
+    }
+
+
+    // =========================================================
+    // CONTACT MESSAGE
+    // =========================================================
+
+    @Transactional
+    public void sendAndSaveContactMessage(
+            ContactMessageRequest request
+    ) {
+
+        // Bazaya yadda saxla
+        ContactMessage contactMessage =
+                new ContactMessage();
+
+        contactMessage.setName(
+                request.getName()
         );
 
-        mailSender.send(message);
+        contactMessage.setEmail(
+                request.getEmail()
+        );
+
+        contactMessage.setSubject(
+                request.getSubject()
+        );
+
+        contactMessage.setMessage(
+                request.getMessage()
+        );
+
+        contactMessageRepository.save(
+                contactMessage
+        );
+
+
+        String subject =
+                request.getSubject() != null
+                        && !request.getSubject()
+                        .trim()
+                        .isEmpty()
+                        ? request.getSubject()
+                        : "Yeni Əlaqə Formu Mesajı";
+
+
+        String text =
+                "Kimdən: "
+                        + request.getName()
+                        + "\n" +
+
+                        "E-poçt: "
+                        + request.getEmail()
+                        + "\n\n" +
+
+                        "Mesaj:\n"
+                        + request.getMessage();
+
+
+        sendEmail(
+                "nomadyouth26@gmail.com",
+                subject,
+                text
+        );
+    }
+
+
+    // =========================================================
+    // COMMON SEND METHOD
+    // =========================================================
+
+    private void sendEmail(
+            String email,
+            String subject,
+            String text
+    ) {
+
+        restClient.post()
+                .uri("/emails")
+                .header(
+                        HttpHeaders.AUTHORIZATION,
+                        "Bearer " + resendApiKey
+                )
+                .contentType(
+                        MediaType.APPLICATION_JSON
+                )
+                .body(
+                        Map.of(
+                                "from", resendFrom,
+                                "to", email,
+                                "subject", subject,
+                                "text", text
+                        )
+                )
+                .retrieve()
+                .toBodilessEntity();
     }
 }

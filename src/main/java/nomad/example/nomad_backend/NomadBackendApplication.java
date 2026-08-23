@@ -39,6 +39,10 @@ public class NomadBackendApplication {
 				"CLOUDINARY_API_SECRET",
 				dotenv.get("CLOUDINARY_API_SECRET")
 		);
+		System.setProperty(
+				"RESEND_API_KEY",
+				dotenv.get("RESEND_API_KEY")
+		);
 		SpringApplication.run(NomadBackendApplication.class, args);
 	}
 }

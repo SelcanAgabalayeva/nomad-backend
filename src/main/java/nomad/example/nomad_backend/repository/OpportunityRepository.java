@@ -59,4 +59,6 @@ o.deadline ASC
     Optional<Opportunity> findByIdAndActiveTrue(Long id);
     List<Opportunity> findAllByActiveTrueOrderByDeadlineAsc();
     Page<Opportunity> findAllByActiveTrueOrderByDeadlineAsc(Pageable pageable);
+
+    void deleteByDeadlineBefore(LocalDate date);
 }

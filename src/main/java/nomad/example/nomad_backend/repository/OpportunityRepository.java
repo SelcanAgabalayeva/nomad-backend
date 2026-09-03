@@ -1,6 +1,7 @@
 package nomad.example.nomad_backend.repository;
 
 import nomad.example.nomad_backend.entity.Opportunity;
+import nomad.example.nomad_backend.enums.OpportunityScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -59,6 +60,8 @@ o.deadline ASC
     Optional<Opportunity> findByIdAndActiveTrue(Long id);
     List<Opportunity> findAllByActiveTrueOrderByDeadlineAsc();
     Page<Opportunity> findAllByActiveTrueOrderByDeadlineAsc(Pageable pageable);
-
+    List<Opportunity> findAllByActiveTrueAndScopeOrderByDeadlineAsc(
+            OpportunityScope scope
+    );
     void deleteByDeadlineBefore(LocalDate date);
 }

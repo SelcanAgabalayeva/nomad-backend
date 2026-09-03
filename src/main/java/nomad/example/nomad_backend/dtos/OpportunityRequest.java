@@ -3,6 +3,7 @@ package nomad.example.nomad_backend.dtos;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nomad.example.nomad_backend.enums.OpportunityScope;
 
 import java.time.LocalDate;
 
@@ -36,4 +37,5 @@ public class OpportunityRequest {
     private String financialSupport;
     private String ageRequirement;
     private String volunteeringType;
+    private OpportunityScope scope;
 }

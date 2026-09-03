@@ -2,6 +2,7 @@ package nomad.example.nomad_backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import nomad.example.nomad_backend.enums.OpportunityScope;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -72,7 +73,9 @@ public class Opportunity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private OpportunityStatus status = OpportunityStatus.READY;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "scope")
+    private OpportunityScope scope;
 
 }
 

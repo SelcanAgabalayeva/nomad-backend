@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.*;
 import nomad.example.nomad_backend.entity.Opportunity;
 import nomad.example.nomad_backend.entity.OpportunityStatus;
+import nomad.example.nomad_backend.enums.OpportunityScope;
 import nomad.example.nomad_backend.repository.OpportunityRepository;
 
 import nomad.example.nomad_backend.service.ProjectService;
@@ -34,25 +35,42 @@ public class OpportunityController {
 
 
     @GetMapping
-    public List<OpportunityResponse> getAll(@RequestParam(required = false) String format) {
+    public List<OpportunityResponse> getAll(
+            @RequestParam(required = false) String format,
+            @RequestParam(required = false) OpportunityScope scope
+    ) {
 
         String normalizedFormat = normalizeFormat(format);
 
-        return repository.findAllByActiveTrueOrderByDeadlineAsc()
+        List<Opportunity> opportunities;
+
+        if (scope != null) {
+            opportunities = repository
+                    .findAllByActiveTrueAndScopeOrderByDeadlineAsc(scope);
+        } else {
+            opportunities = repository
+                    .findAllByActiveTrueOrderByDeadlineAsc();
+        }
+
+        return opportunities
                 .stream()
                 .filter(o -> {
                     if (normalizedFormat == null) return true;
-                    return o.getTypeDetail() != null && o.getTypeDetail().equalsIgnoreCase(normalizedFormat);
+
+                    return o.getTypeDetail() != null
+                            && o.getTypeDetail()
+                            .equalsIgnoreCase(normalizedFormat);
                 })
                 .map(opportunity -> {
 
-                    // 1. typeDetail üçün FRONTEND HİYLƏSİ (null əvəzinə "" göndəririk)
                     String typeDetail = opportunity.getTypeDetail();
-                    if (typeDetail == null || "Hamısı".equalsIgnoreCase(typeDetail) || "Hamisi".equalsIgnoreCase(typeDetail)) {
+
+                    if (typeDetail == null
+                            || "Hamısı".equalsIgnoreCase(typeDetail)
+                            || "Hamisi".equalsIgnoreCase(typeDetail)) {
                         typeDetail = "";
                     }
 
-                    // 2. ESC/SALTO boyuk harfle
                     String escOrSalto = opportunity.getEscOrSalto() != null
                             ? opportunity.getEscOrSalto().trim().toUpperCase()
                             : null;
@@ -64,15 +82,24 @@ public class OpportunityController {
                             .city(opportunity.getCity())
                             .duration(opportunity.getDuration())
                             .eventDateRange(opportunity.getEventDateRange())
-                            .durationType(durationTypeService.determine(opportunity.getDuration()))
-                            .visaType(visaService.determine(opportunity.getCountry()))
+                            .durationType(
+                                    durationTypeService.determine(
+                                            opportunity.getDuration()
+                                    )
+                            )
+                            .visaType(
+                                    visaService.determine(
+                                            opportunity.getCountry()
+                                    )
+                            )
                             .deadline(opportunity.getDeadline())
                             .type(opportunity.getType())
-                            .typeDetail(typeDetail) // Sahə əlavə olundu
-                            .escOrSalto(escOrSalto) // Sahə əlavə olundu
-                            .volunteeringType(opportunity.getVolunteeringType()) // Sahə əlavə olundu
+                            .typeDetail(typeDetail)
+                            .escOrSalto(escOrSalto)
+                            .volunteeringType(opportunity.getVolunteeringType())
                             .category(opportunity.getCategory())
                             .applyLink(opportunity.getApplyLink())
+                            .scope(opportunity.getScope())
                             .build();
                 })
                 .toList();
@@ -106,6 +133,7 @@ public class OpportunityController {
                 .active(true)
                 .createdAt(LocalDateTime.now())
                 .status(OpportunityStatus.READY)
+                .scope(request.getScope())
                 .build();
 
         Opportunity saved = repository.save(opportunity);
@@ -130,6 +158,7 @@ public class OpportunityController {
                 .category(saved.getCategory())
                 .applyLink(saved.getApplyLink())
                 .volunteeringType(saved.getVolunteeringType())
+                .scope(saved.getScope())
                 .build();
     }
 
@@ -152,7 +181,7 @@ public class OpportunityController {
         opportunity.setSumAz(request.getSumAz());
         opportunity.setSumEn(request.getSumEn());
         opportunity.setSumRus(request.getSumRus());
-
+        opportunity.setScope(request.getScope());
         opportunity.setTypeDetail(request.getTypeDetail());
         opportunity.setCountry(request.getCountry());
         opportunity.setApplyLink(request.getApplyLink());
@@ -196,6 +225,7 @@ public class OpportunityController {
                 .category(saved.getCategory())
                 .applyLink(saved.getApplyLink())
                 .volunteeringType(saved.getVolunteeringType())
+                .scope(saved.getScope())
                 .build();
     }
     @DeleteMapping("/{id}")

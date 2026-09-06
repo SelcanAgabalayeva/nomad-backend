@@ -100,7 +100,7 @@ public class OpportunityController {
                             .category(opportunity.getCategory())
                             .applyLink(opportunity.getApplyLink())
                             .scope(opportunity.getScope())
-                            .description(opportunity.getDescription())
+                            .description(opportunity.getSumAz())
                             .build();
                 })
                 .toList();
@@ -308,7 +308,7 @@ public class OpportunityController {
                             .deadline(opportunity.getDeadline())
                             .type(opportunity.getType())
                             .typeDetail(typeDetail)
-                            .description(opportunity.getDescription())
+                            .description(opportunity.getSumAz())
                             .category(opportunity.getCategory())
                             .applyLink(opportunity.getApplyLink())
                             .build();

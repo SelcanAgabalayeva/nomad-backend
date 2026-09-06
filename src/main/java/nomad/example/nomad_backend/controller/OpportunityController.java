@@ -308,6 +308,7 @@ public class OpportunityController {
                             .deadline(opportunity.getDeadline())
                             .type(opportunity.getType())
                             .typeDetail(typeDetail)
+                            .description(opportunity.getDescription())
                             .category(opportunity.getCategory())
                             .applyLink(opportunity.getApplyLink())
                             .build();

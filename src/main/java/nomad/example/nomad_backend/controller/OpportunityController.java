@@ -100,6 +100,7 @@ public class OpportunityController {
                             .category(opportunity.getCategory())
                             .applyLink(opportunity.getApplyLink())
                             .scope(opportunity.getScope())
+                            .description(opportunity.getDescription())
                             .build();
                 })
                 .toList();

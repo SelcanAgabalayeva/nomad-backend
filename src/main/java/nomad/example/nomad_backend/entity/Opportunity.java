@@ -76,6 +76,7 @@ public class Opportunity {
     @Enumerated(EnumType.STRING)
     @Column(name = "scope")
     private OpportunityScope scope;
+    private String description;
 
 }
 

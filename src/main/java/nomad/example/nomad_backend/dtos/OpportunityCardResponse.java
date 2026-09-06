@@ -33,6 +33,7 @@ public class OpportunityCardResponse {
     private String applyLink;
     private String duration;
     private DurationType durationType;
+    private String description;
     private VisaType visaType;
 
 }

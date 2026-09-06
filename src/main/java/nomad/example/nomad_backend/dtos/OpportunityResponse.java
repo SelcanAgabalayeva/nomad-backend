@@ -35,4 +35,5 @@ public class OpportunityResponse {
     private String applyLink;
     private String volunteeringType;
     private OpportunityScope scope;
+    private String description;
 }

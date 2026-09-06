@@ -327,7 +327,7 @@ public class ProjectService {
                     .isApplied(isApplied)
                     .escOrSalto(opp.getEscOrSalto())
                     .volunteeringType(opp.getVolunteeringType())
-
+                    .description(opp.getDescription())
                     .duration(opp.getDuration())
                     .durationType(
                             durationTypeService.determine(opp.getDuration())

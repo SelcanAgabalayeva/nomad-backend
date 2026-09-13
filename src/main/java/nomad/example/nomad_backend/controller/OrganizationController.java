@@ -1,6 +1,7 @@
 package nomad.example.nomad_backend.controller;
 
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.OrganizationRatingRequest;
 import nomad.example.nomad_backend.dtos.OrganizationResponse;
 import nomad.example.nomad_backend.entity.Organization;
 import nomad.example.nomad_backend.service.OrganizationService;
@@ -40,5 +41,19 @@ public class OrganizationController {
         return ResponseEntity.ok(
                 organizationService.getOrganizationBySlug(slug)
         );
+    }
+    @PostMapping("/{slug}/rating")
+    public ResponseEntity<Void> rateOrganization(
+            @PathVariable String slug,
+            @RequestBody OrganizationRatingRequest request
+    ) {
+
+        organizationService.rateOrganization(
+                slug,
+                request.getUserId(),
+                request.getRating()
+        );
+
+        return ResponseEntity.ok().build();
     }
 }

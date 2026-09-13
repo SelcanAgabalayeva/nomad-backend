@@ -34,4 +34,6 @@ public class OrganizationResponse {
     private String location;
 
     private String logo;
+    private Double rating;
+    private Long reviewCount;
 }

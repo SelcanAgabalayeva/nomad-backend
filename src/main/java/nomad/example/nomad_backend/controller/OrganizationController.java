@@ -2,6 +2,7 @@ package nomad.example.nomad_backend.controller;
 
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.OrganizationResponse;
+import nomad.example.nomad_backend.entity.Organization;
 import nomad.example.nomad_backend.service.OrganizationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,16 @@ public class OrganizationController {
                 organizationService.getAllOrganizations()
         );
     }
+    @PostMapping
+    public ResponseEntity<OrganizationResponse> createOrganization(
+            @RequestBody Organization organization
+    ) {
+        Organization saved = organizationService.save(organization);
 
+        return ResponseEntity.ok(
+                organizationService.getOrganizationBySlug(saved.getSlug())
+        );
+    }
     @GetMapping("/{slug}")
     public ResponseEntity<OrganizationResponse> getOrganizationBySlug(
             @PathVariable String slug

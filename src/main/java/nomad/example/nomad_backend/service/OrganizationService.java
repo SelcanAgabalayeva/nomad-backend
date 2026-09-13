@@ -50,4 +50,9 @@ public class OrganizationService {
                 .logo(organization.getLogo())
                 .build();
     }
+
+    public Organization save(Organization organization) {
+        return organizationRepository.save(organization);
+    }
+
 }

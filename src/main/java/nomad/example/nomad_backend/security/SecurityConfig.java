@@ -63,6 +63,7 @@ public class SecurityConfig {
                                 "/api/opportunities/**",
                                 "/api/v1/likes/**",
                                 "/uploads/**",
+                                "/api/organizations/**",
                                 "/api/v1/test-email"
                         ).permitAll()
 

@@ -111,4 +111,44 @@ public class OrganizationService {
 
         ratingRepository.save(organizationRating);
     }
+
+    @Transactional
+    public OrganizationResponse updateOrganization(
+            String slug,
+            Organization updatedOrganization
+    ) {
+
+        Organization organization = organizationRepository
+                .findBySlug(slug)
+                .orElseThrow(() ->
+                        new RuntimeException("Organization not found")
+                );
+
+        organization.setName(updatedOrganization.getName());
+        organization.setSlug(updatedOrganization.getSlug());
+        organization.setTagline(updatedOrganization.getTagline());
+        organization.setDescription(updatedOrganization.getDescription());
+        organization.setCategories(updatedOrganization.getCategories());
+        organization.setWebsite(updatedOrganization.getWebsite());
+        organization.setInstagram(updatedOrganization.getInstagram());
+        organization.setFacebook(updatedOrganization.getFacebook());
+        organization.setEmail(updatedOrganization.getEmail());
+        organization.setLocation(updatedOrganization.getLocation());
+        organization.setLogo(updatedOrganization.getLogo());
+
+        Organization saved = organizationRepository.save(organization);
+
+        return toResponses(saved);
+    }
+    @Transactional
+    public void deleteOrganization(String slug) {
+
+        Organization organization = organizationRepository
+                .findBySlug(slug)
+                .orElseThrow(() ->
+                        new RuntimeException("Organization not found")
+                );
+
+        organizationRepository.delete(organization);
+    }
 }

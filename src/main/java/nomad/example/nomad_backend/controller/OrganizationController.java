@@ -56,4 +56,25 @@ public class OrganizationController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{slug}")
+    public ResponseEntity<OrganizationResponse> updateOrganization(
+            @PathVariable String slug,
+            @RequestBody Organization organization
+    ) {
+
+        return ResponseEntity.ok(
+                organizationService.updateOrganization(slug, organization)
+        );
+    }
+
+    @DeleteMapping("/{slug}")
+    public ResponseEntity<Void> deleteOrganization(
+            @PathVariable String slug
+    ) {
+
+        organizationService.deleteOrganization(slug);
+
+        return ResponseEntity.noContent().build();
+    }
 }

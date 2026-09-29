@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN mvn clean package -DskipTests
+RUN mvn -B -U -Dmaven.wagon.http.retryHandler.count=5 clean package -DskipTests
 
 EXPOSE 8080
 

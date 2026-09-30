@@ -231,13 +231,11 @@ public class OpportunityController {
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOpportunity(@PathVariable Long id) {
-
         Opportunity opportunity = repository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Opportunity tapılmadı: " + id)
-                );
+                .orElseThrow(() -> new RuntimeException("Opportunity tapılmadı: " + id));
 
-        repository.delete(opportunity);
+        opportunity.setActive(false);
+        repository.save(opportunity);
 
         return ResponseEntity.noContent().build();
     }

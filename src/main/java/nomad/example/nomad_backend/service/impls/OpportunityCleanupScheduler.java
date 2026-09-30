@@ -6,6 +6,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import nomad.example.nomad_backend.entity.Opportunity;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -19,43 +21,38 @@ public class OpportunityCleanupScheduler {
     private static final DateTimeFormatter EVENT_DATE_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    @Scheduled(cron = "0 0 0 * * *")
-    public void deleteExpiredOpportunities() {
+    @Scheduled(
+            cron = "0 0 0 * * *",
+            zone = "Asia/Baku"
+    )
+    @Transactional
+    public void deactivateExpiredOpportunities() {
+
+        List<Opportunity> opportunities =
+                opportunityRepository.findByActiveTrue();
 
         LocalDate today = LocalDate.now();
 
-        // 1. Deadline-i keçmiş opportunity-ləri sil
-        opportunityRepository.deleteByDeadlineBefore(today);
-
-        // 2. Deadline-i olmayan, amma event tarixi keçmiş opportunity-ləri sil
-        List<Opportunity> opportunities = opportunityRepository.findAll();
-
         for (Opportunity opportunity : opportunities) {
 
-            // Deadline varsa, artıq yuxarıdakı query idarə edir
+            LocalDate expirationDate;
+
             if (opportunity.getDeadline() != null) {
-                continue;
+                expirationDate = opportunity.getDeadline();
+            } else {
+                expirationDate = extractEventEndDate(
+                        opportunity.getEventDateRange()
+                );
             }
 
-            LocalDate eventEndDate =
-                    extractEventEndDate(opportunity.getEventDateRange());
+            if (expirationDate != null
+                    && expirationDate.isBefore(today)) {
 
-            if (eventEndDate != null && eventEndDate.isBefore(today)) {
-
-                opportunityRepository.delete(opportunity);
-
-                System.out.println(
-                        "Event tarixi keçmiş opportunity silindi: "
-                                + opportunity.getTitle()
-                                + " | Event: "
-                                + opportunity.getEventDateRange()
-                );
+                opportunity.setActive(false);
             }
         }
 
-        System.out.println(
-                "Opportunity cleanup tamamlandı. Tarix: " + today
-        );
+        opportunityRepository.saveAll(opportunities);
     }
 
     private LocalDate extractEventEndDate(String eventDateRange) {

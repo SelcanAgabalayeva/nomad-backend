@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.*;
 import nomad.example.nomad_backend.entity.Opportunity;
 import nomad.example.nomad_backend.entity.OpportunityStatus;
+import nomad.example.nomad_backend.entity.Organization;
 import nomad.example.nomad_backend.enums.OpportunityScope;
 import nomad.example.nomad_backend.repository.OpportunityRepository;
 
+import nomad.example.nomad_backend.repository.OrganizationRepository;
 import nomad.example.nomad_backend.service.ProjectService;
 
 import nomad.example.nomad_backend.service.impls.DurationTypeService;
@@ -33,6 +35,7 @@ public class OpportunityController {
     private final DurationTypeService durationTypeService;
     private final VisaService visaService;
     private final EmailService emailService;
+    private final OrganizationRepository organizationRepository;
 
 
 
@@ -112,6 +115,17 @@ public class OpportunityController {
             @RequestBody OpportunityRequest request
     ) {
 
+        Organization organization = null;
+
+        if (request.getOrganizationId() != null) {
+
+            organization = organizationRepository.findById(
+                    request.getOrganizationId()
+            ).orElseThrow(() ->
+                    new RuntimeException("Organization not found")
+            );
+        }
+
         Opportunity opportunity = Opportunity.builder()
                 .title(request.getTitle())
                 .deadline(request.getDeadline())
@@ -137,6 +151,7 @@ public class OpportunityController {
                 .createdAt(LocalDateTime.now())
                 .status(OpportunityStatus.READY)
                 .scope(request.getScope())
+                .organization(organization)
                 .build();
 
         Opportunity saved = repository.save(opportunity);

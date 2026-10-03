@@ -38,4 +38,6 @@ public class OpportunityRequest {
     private String ageRequirement;
     private String volunteeringType;
     private OpportunityScope scope;
+
+    private Long organizationId;
 }

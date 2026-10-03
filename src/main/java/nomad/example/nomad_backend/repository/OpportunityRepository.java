@@ -63,5 +63,5 @@ o.deadline ASC
     List<Opportunity> findAllByActiveTrueAndScopeOrderByDeadlineAsc(
             OpportunityScope scope
     );
-
+    long countByOrganizationIdAndActiveTrue(Long organizationId);
 }

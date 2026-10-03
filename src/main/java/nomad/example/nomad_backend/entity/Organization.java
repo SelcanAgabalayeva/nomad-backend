@@ -48,4 +48,6 @@ public class Organization {
     private String location;
 
     private String logo;
+    @OneToMany(mappedBy = "organization")
+    private List<Opportunity> opportunities;
 }

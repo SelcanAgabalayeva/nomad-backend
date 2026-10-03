@@ -77,6 +77,10 @@ public class Opportunity {
     @Column(name = "scope")
     private OpportunityScope scope;
 
+    @ManyToOne
+    @JoinColumn(name = "organization_id")
+    private Organization organization;
+
 
 }
 

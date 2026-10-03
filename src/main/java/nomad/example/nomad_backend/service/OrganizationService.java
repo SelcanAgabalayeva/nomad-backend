@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.OrganizationResponse;
 import nomad.example.nomad_backend.entity.Organization;
 import nomad.example.nomad_backend.entity.OrganizationRating;
+import nomad.example.nomad_backend.repository.OpportunityRepository;
 import nomad.example.nomad_backend.repository.OrganizationRatingRepository;
 import nomad.example.nomad_backend.repository.OrganizationRepository;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final OrganizationRatingRepository ratingRepository;
+    private final OpportunityRepository opportunityRepository;
 
     public List<OrganizationResponse> getAllOrganizations() {
 
@@ -46,7 +48,10 @@ public class OrganizationService {
 
         long reviewCount =
                 ratingRepository.countByOrganizationId(organization.getId());
-
+        long activeOpportunityCount =
+                opportunityRepository.countByOrganizationIdAndActiveTrue(
+                        organization.getId()
+                );
         Double rating = null;
 
         if (reviewCount >= 5) {
@@ -73,6 +78,7 @@ public class OrganizationService {
                 .logo(organization.getLogo())
                 .rating(rating)
                 .reviewCount(reviewCount)
+                .activeOpportunityCount(activeOpportunityCount)
                 .build();
     }
 

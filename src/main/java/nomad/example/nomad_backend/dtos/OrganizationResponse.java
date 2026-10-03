@@ -36,4 +36,5 @@ public class OrganizationResponse {
     private String logo;
     private Double rating;
     private Long reviewCount;
+    private long activeOpportunityCount;
 }

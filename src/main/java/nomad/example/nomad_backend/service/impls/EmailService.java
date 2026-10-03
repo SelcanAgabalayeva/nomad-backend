@@ -3,7 +3,9 @@ package nomad.example.nomad_backend.service.impls;
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.ContactMessageRequest;
 import nomad.example.nomad_backend.entity.ContactMessage;
+import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.repository.ContactMessageRepository;
+import nomad.example.nomad_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -18,6 +21,7 @@ import java.util.Map;
 public class EmailService {
 
     private final ContactMessageRepository contactMessageRepository;
+    private final UserRepository userRepository;
 
     @Value("${resend.api-key}")
     private String resendApiKey;
@@ -130,6 +134,76 @@ public class EmailService {
     // CONTACT MESSAGE
     // =========================================================
 
+    public void notifyUsersAboutNewOpportunity(
+            String title,
+            String category,
+            String type,
+            String typeDetail
+    ) {
+
+        List<User> users =
+                userRepository.findByNewsletterTrueAndEmailVerifiedTrue();
+
+        for (User user : users) {
+
+            if (hasMatchingInterest(
+                    user,
+                    category,
+                    type,
+                    typeDetail
+            )) {
+
+                sendInterestNotification(
+                        user.getEmail(),
+                        title
+                );
+            }
+        }
+    }
+    private boolean hasMatchingInterest(
+            User user,
+            String category,
+            String type,
+            String typeDetail
+    ) {
+
+        if (user.getInterests() == null
+                || user.getInterests().isEmpty()) {
+            return false;
+        }
+
+        for (String interest : user.getInterests()) {
+
+            if (interest == null || interest.isBlank()) {
+                continue;
+            }
+
+            String normalizedInterest =
+                    interest.trim().toLowerCase();
+
+            if (matches(normalizedInterest, category)
+                    || matches(normalizedInterest, type)
+                    || matches(normalizedInterest, typeDetail)) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+    private boolean matches(
+            String interest,
+            String value
+    ) {
+
+        if (value == null || value.isBlank()) {
+            return false;
+        }
+
+        return interest.equals(
+                value.trim().toLowerCase()
+        );
+    }
     @Transactional
     public void sendAndSaveContactMessage(
             ContactMessageRequest request

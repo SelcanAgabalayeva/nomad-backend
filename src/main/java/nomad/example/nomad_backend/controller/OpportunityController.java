@@ -10,6 +10,7 @@ import nomad.example.nomad_backend.repository.OpportunityRepository;
 import nomad.example.nomad_backend.service.ProjectService;
 
 import nomad.example.nomad_backend.service.impls.DurationTypeService;
+import nomad.example.nomad_backend.service.impls.EmailService;
 import nomad.example.nomad_backend.service.impls.VisaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,7 @@ public class OpportunityController {
 
     private final DurationTypeService durationTypeService;
     private final VisaService visaService;
+    private final EmailService emailService;
 
 
 
@@ -138,7 +140,12 @@ public class OpportunityController {
                 .build();
 
         Opportunity saved = repository.save(opportunity);
-
+        emailService.notifyUsersAboutNewOpportunity(
+                saved.getTitle(),
+                saved.getCategory(),
+                saved.getType(),
+                saved.getTypeDetail()
+        );
         return OpportunityResponse.builder()
                 .id(saved.getId())
                 .title(saved.getTitle())

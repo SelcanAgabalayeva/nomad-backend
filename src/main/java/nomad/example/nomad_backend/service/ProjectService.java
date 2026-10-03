@@ -16,17 +16,16 @@ import nomad.example.nomad_backend.service.impls.VisaService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -35,16 +34,6 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final DurationTypeService durationTypeService;
     private final VisaService visaService;
-
-    public ProjectService(ProjectRepository projectRepository, MessageSource messageSource,
-                          OpportunityRepository opportunityRepository, UserRepository userRepository, DurationTypeService durationTypeService, VisaService visaService) {
-        this.projectRepository = projectRepository;
-        this.messageSource = messageSource;
-        this.opportunityRepository = opportunityRepository;
-        this.userRepository = userRepository;
-        this.durationTypeService = durationTypeService;
-        this.visaService = visaService;
-    }
 
     public List<UserProject> getSavedProjects() {
         return projectRepository.findByStatus(ProjectStatus.SAVED);
@@ -73,26 +62,19 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-
     public UserProject setProjectStatus(Long userId, Long opportunityId, ProjectStatus status) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Opportunity opportunity = opportunityRepository.findById(opportunityId)
                 .orElseThrow(() -> new RuntimeException(
-                        messageSource.getMessage(
-                                "project.not.found",
-                                null,
-                                LocaleContextHolder.getLocale()
-                        )
+                        messageSource.getMessage("project.not.found", null, LocaleContextHolder.getLocale())
                 ));
 
         List<UserProject> existingProjects =
                 projectRepository.findAllByUser_IdAndOpportunity_Id(userId, opportunityId);
 
         UserProject project;
-
         if (!existingProjects.isEmpty()) {
             project = existingProjects.get(0);
         } else {
@@ -107,13 +89,37 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public List<OpportunityCardResponse> getAllOpportunitiesForCards(Long userId) {
+    @Transactional(readOnly = true)
+    public List<OpportunityCardResponse> getAllOpportunitiesForCards(
+            Long userId,
+            String search,
+            String category,
+            String format) {
 
-        List<Opportunity> opportunities =
-                opportunityRepository.findByActiveTrue();
+        String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+        String categoryParam = (category != null && !category.trim().isEmpty()
+                && !category.equalsIgnoreCase("Bütün kateqoriyalar")
+                && !category.equalsIgnoreCase("Hamısı")) ? category.trim() : null;
 
-        Map<Long, ProjectStatus> userProjectStatusMap = java.util.Collections.emptyMap();
+        String formatParam = null;
+        if (format != null && !format.trim().isEmpty()
+                && !format.equalsIgnoreCase("Hamısı")
+                && !format.equalsIgnoreCase("Bütün kateqoriyalar")) {
+            String trimmed = format.trim();
+            if (trimmed.equalsIgnoreCase("Onlayn") || trimmed.equalsIgnoreCase("Online")) {
+                formatParam = "Online";
+            } else if (trimmed.equalsIgnoreCase("Əyani") || trimmed.equalsIgnoreCase("Offline")) {
+                formatParam = "Offline";
+            } else {
+                formatParam = trimmed.toLowerCase();
+            }
+        }
 
+        // Baza səviyyəsində yalnız active=true olanları çəkirik
+        List<Opportunity> opportunities = opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam);
+
+        // N+1 sorğusunun qarşısını almaq üçün MAP
+        Map<Long, ProjectStatus> userProjectStatusMap = Collections.emptyMap();
         if (userId != null) {
             userProjectStatusMap = projectRepository.findByUserId(userId).stream()
                     .collect(Collectors.toMap(
@@ -124,24 +130,16 @@ public class ProjectService {
         }
 
         Map<Long, ProjectStatus> finalMap = userProjectStatusMap;
+        LocalDate today = LocalDate.now();
 
         return opportunities.stream().map(opp -> {
-
             long daysLeft = 0;
-
             if (opp.getDeadline() != null) {
-                daysLeft = ChronoUnit.DAYS.between(
-                        LocalDate.now(),
-                        opp.getDeadline()
-                );
-
-                if (daysLeft < 0) {
-                    daysLeft = 0;
-                }
+                daysLeft = ChronoUnit.DAYS.between(today, opp.getDeadline());
+                if (daysLeft < 0) daysLeft = 0;
             }
 
             ProjectStatus status = finalMap.get(opp.getId());
-
             boolean isSaved = status == ProjectStatus.SAVED;
             boolean isApplied = status == ProjectStatus.APPLIED;
 
@@ -158,34 +156,20 @@ public class ProjectService {
                     .eventDateRange(opp.getEventDateRange())
                     .applyLink(opp.getApplyLink())
                     .daysLeft(daysLeft)
-
                     .isSaved(isSaved)
                     .isApplied(isApplied)
-
                     .escOrSalto(opp.getEscOrSalto())
                     .volunteeringType(opp.getVolunteeringType())
-
+                    .description(opp.getSumAz())
                     .duration(opp.getDuration())
-
-                    .durationType(
-                            durationTypeService.determine(
-                                    opp.getDuration()
-                            )
-                    )
-
-                    .visaType(
-                            visaService.determine(
-                                    opp.getCountry()
-                            )
-                    )
-
+                    .durationType(durationTypeService.determine(opp.getDuration()))
+                    .visaType(visaService.determine(opp.getCountry()))
                     .build();
-
         }).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public OpportunityDetailResponse getOpportunityDetails(Long opportunityId, Long userId, String lang) {
-
         Opportunity opp = opportunityRepository.findByIdAndActiveTrue(opportunityId)
                 .orElseThrow(() -> new RuntimeException("Elan tapılmadı"));
 
@@ -228,18 +212,8 @@ public class ProjectService {
                 .isApplied(isApplied)
                 .duration(opp.getDuration())
                 .language(opp.getLanguage())
-
-                .durationType(
-                        durationTypeService.determine(
-                                opp.getDuration()
-                        )
-                )
-
-                .visaType(
-                        visaService.determine(
-                                opp.getCountry()
-                        )
-                )
+                .durationType(durationTypeService.determine(opp.getDuration()))
+                .visaType(visaService.determine(opp.getCountry()))
                 .financialSupport(opp.getFinancialSupport())
                 .volunteeringType(opp.getVolunteeringType())
                 .ageRequirement(opp.getAgeRequirement())
@@ -258,87 +232,4 @@ public class ProjectService {
                 .categoriesCount(categoriesCount)
                 .build();
     }
-
-    public List<OpportunityCardResponse> getAllOpportunitiesForCards(
-            Long userId,
-            String search,
-            String category,
-            String format) {
-
-        String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
-        String categoryParam = (category != null && !category.trim().isEmpty() && !category.equalsIgnoreCase("Bütün kateqoriyalar") && !category.equalsIgnoreCase("Hamısı")) ? category.trim() : null;
-
-        // FORMATI ELƏ TƏNZİMLƏYİRİK Kİ, BAZADA HƏM "Onlayn", HƏM DƏ "Online" YAZILSA TAPILSIN:
-        // FORMATI ELƏ TƏNZİMLƏYİRİK Kİ, BAZADA "Online", "online", "Onlayn" VƏ YA "Offline", "Əyani" YAZILSA DAHİ TAPILSIN:
-        String formatParam = null;
-        if (format != null && !format.trim().isEmpty() && !format.equalsIgnoreCase("Hamısı") && !format.equalsIgnoreCase("Bütün kateqoriyalar")) {
-            String trimmed = format.trim();
-            if (trimmed.equalsIgnoreCase("Onlayn") || trimmed.equalsIgnoreCase("Online")) {
-                formatParam = "Online";
-            } else if (trimmed.equalsIgnoreCase("Əyani") || trimmed.equalsIgnoreCase("Offline")) {
-                formatParam = "Offline";
-            } else {
-                formatParam = trimmed.toLowerCase();
-            }
-        }
-        List<Opportunity> opportunities =
-                opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam)
-                        .stream()
-                        .filter(Opportunity::isActive)
-                        .collect(Collectors.toList());
-
-        Map<Long, ProjectStatus> userProjectStatusMap = java.util.Collections.emptyMap();
-        if (userId != null) {
-            userProjectStatusMap = projectRepository.findByUserId(userId).stream()
-                    .collect(Collectors.toMap(
-                            up -> up.getOpportunity().getId(),
-                            UserProject::getStatus,
-                            (existing, replacement) -> existing
-                    ));
-        }
-
-        Map<Long, ProjectStatus> finalMap = userProjectStatusMap;
-
-        return opportunities.stream().map(opp -> {
-            long daysLeft = 0;
-            if (opp.getDeadline() != null) {
-                daysLeft = java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), opp.getDeadline());
-                if (daysLeft < 0) daysLeft = 0;
-            }
-
-            ProjectStatus status = finalMap.get(opp.getId());
-            boolean isSaved = status == ProjectStatus.SAVED;
-            boolean isApplied = status == ProjectStatus.APPLIED;
-
-            return OpportunityCardResponse.builder()
-                    .id(opp.getId())
-                    .title(opp.getTitle())
-                    .country(opp.getCountry())
-                    .city(opp.getCity())
-                    .type(opp.getType())
-                    .category(opp.getCategory())
-                    .typeDetail(opp.getTypeDetail())
-                    .deadline(opp.getDeadline())
-                    .openingDate(opp.getOpeningDate())
-                    .eventDateRange(opp.getEventDateRange())
-                    .applyLink(opp.getApplyLink())
-                    .daysLeft(daysLeft)
-                    .isSaved(isSaved)
-                    .isApplied(isApplied)
-                    .escOrSalto(opp.getEscOrSalto())
-                    .volunteeringType(opp.getVolunteeringType())
-                    .description(opp.getSumAz())
-                    .duration(opp.getDuration())
-                    .durationType(
-                            durationTypeService.determine(opp.getDuration())
-                    )
-                    .visaType(
-                            visaService.determine(opp.getCountry())
-                    )
-                    .build();
-        }).collect(Collectors.toList());
-    }
-
-
-    }
-
+}

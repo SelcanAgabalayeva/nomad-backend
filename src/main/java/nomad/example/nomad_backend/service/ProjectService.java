@@ -15,6 +15,9 @@ import nomad.example.nomad_backend.service.impls.DurationTypeService;
 import nomad.example.nomad_backend.service.impls.VisaService;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,12 +92,15 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+
+
     @Transactional(readOnly = true)
-    public List<OpportunityCardResponse> getAllOpportunitiesForCards(
+    public Page<OpportunityCardResponse> getAllOpportunitiesForCards(
             Long userId,
             String search,
             String category,
-            String format) {
+            String format,
+            Pageable pageable) {
 
         String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
         String categoryParam = (category != null && !category.trim().isEmpty()
@@ -115,10 +121,9 @@ public class ProjectService {
             }
         }
 
-        // Baza səviyyəsində yalnız active=true olanları çəkirik
+        // Bazadan bütün siyahı yerinə lazımi filtrlə datanı alırıq
         List<Opportunity> opportunities = opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam);
 
-        // N+1 sorğusunun qarşısını almaq üçün MAP
         Map<Long, ProjectStatus> userProjectStatusMap = Collections.emptyMap();
         if (userId != null) {
             userProjectStatusMap = projectRepository.findByUserId(userId).stream()
@@ -132,7 +137,7 @@ public class ProjectService {
         Map<Long, ProjectStatus> finalMap = userProjectStatusMap;
         LocalDate today = LocalDate.now();
 
-        return opportunities.stream().map(opp -> {
+        List<OpportunityCardResponse> cardResponses = opportunities.stream().map(opp -> {
             long daysLeft = 0;
             if (opp.getDeadline() != null) {
                 daysLeft = ChronoUnit.DAYS.between(today, opp.getDeadline());
@@ -166,8 +171,17 @@ public class ProjectService {
                     .visaType(visaService.determine(opp.getCountry()))
                     .build();
         }).collect(Collectors.toList());
-    }
 
+        // Siyahını Pageable qaydalarına uyğun hissələrə bölürük
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), cardResponses.size());
+
+        List<OpportunityCardResponse> pageContent = (start <= cardResponses.size())
+                ? cardResponses.subList(start, end)
+                : Collections.emptyList();
+
+        return new PageImpl<>(pageContent, pageable, cardResponses.size());
+    }
     @Transactional(readOnly = true)
     public OpportunityDetailResponse getOpportunityDetails(Long opportunityId, Long userId, String lang) {
         Opportunity opp = opportunityRepository.findByIdAndActiveTrue(opportunityId)

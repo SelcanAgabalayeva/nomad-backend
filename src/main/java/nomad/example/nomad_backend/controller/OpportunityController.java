@@ -357,21 +357,25 @@ public class OpportunityController {
 
 
     @GetMapping("/cards")
-    public ResponseEntity<List<OpportunityCardResponse>> getOpportunityCards(
+    public ResponseEntity<Page<OpportunityCardResponse>> getOpportunityCards(
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String category,
-            @RequestParam(required = false) String format
+            @RequestParam(required = false) String format,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
     ) {
-        // Format parametrini normalize edirik
         String normalizedFormat = normalizeFormat(format);
+
+        Pageable pageable = PageRequest.of(page, size);
 
         return ResponseEntity.ok(
                 projectService.getAllOpportunitiesForCards(
                         userId,
                         search,
                         category,
-                        normalizedFormat
+                        normalizedFormat,
+                        pageable
                 )
         );
     }

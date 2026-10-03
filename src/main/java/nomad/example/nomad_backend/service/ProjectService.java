@@ -103,26 +103,23 @@ public class ProjectService {
             Pageable pageable) {
 
         String searchParam = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+
         String categoryParam = (category != null && !category.trim().isEmpty()
                 && !category.equalsIgnoreCase("Bütün kateqoriyalar")
                 && !category.equalsIgnoreCase("Hamısı")) ? category.trim() : null;
 
-        String formatParam = null;
-        if (format != null && !format.trim().isEmpty()
+        // Controller artıq normalizeFormat edib, burada sadəcə yoxlayırıq
+        String formatParam = (format != null && !format.trim().isEmpty()
                 && !format.equalsIgnoreCase("Hamısı")
-                && !format.equalsIgnoreCase("Bütün kateqoriyalar")) {
-            String trimmed = format.trim();
-            if (trimmed.equalsIgnoreCase("Onlayn") || trimmed.equalsIgnoreCase("Online")) {
-                formatParam = "Online";
-            } else if (trimmed.equalsIgnoreCase("Əyani") || trimmed.equalsIgnoreCase("Offline")) {
-                formatParam = "Offline";
-            } else {
-                formatParam = trimmed.toLowerCase();
-            }
-        }
+                && !format.equalsIgnoreCase("Bütün kateqoriyalar")) ? format.trim() : null;
 
-        // Bazadan bütün siyahı yerinə lazımi filtrlə datanı alırıq
-        List<Opportunity> opportunities = opportunityRepository.searchOpportunities(searchParam, categoryParam, formatParam);
+        // Bazadan birbaşa paged (LIMIT/OFFSET ilə) çəkirik
+        Page<Opportunity> opportunitiesPage = opportunityRepository.searchOpportunities(
+                searchParam,
+                categoryParam,
+                formatParam,
+                pageable
+        );
 
         Map<Long, ProjectStatus> userProjectStatusMap = Collections.emptyMap();
         if (userId != null) {
@@ -137,7 +134,7 @@ public class ProjectService {
         Map<Long, ProjectStatus> finalMap = userProjectStatusMap;
         LocalDate today = LocalDate.now();
 
-        List<OpportunityCardResponse> cardResponses = opportunities.stream().map(opp -> {
+        List<OpportunityCardResponse> cardResponses = opportunitiesPage.getContent().stream().map(opp -> {
             long daysLeft = 0;
             if (opp.getDeadline() != null) {
                 daysLeft = ChronoUnit.DAYS.between(today, opp.getDeadline());
@@ -172,15 +169,7 @@ public class ProjectService {
                     .build();
         }).collect(Collectors.toList());
 
-        // Siyahını Pageable qaydalarına uyğun hissələrə bölürük
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), cardResponses.size());
-
-        List<OpportunityCardResponse> pageContent = (start <= cardResponses.size())
-                ? cardResponses.subList(start, end)
-                : Collections.emptyList();
-
-        return new PageImpl<>(pageContent, pageable, cardResponses.size());
+        return new PageImpl<>(cardResponses, pageable, opportunitiesPage.getTotalElements());
     }
     @Transactional(readOnly = true)
     public OpportunityDetailResponse getOpportunityDetails(Long opportunityId, Long userId, String lang) {

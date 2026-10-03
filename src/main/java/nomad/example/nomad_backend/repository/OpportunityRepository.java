@@ -23,11 +23,8 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
     @Query("""
 SELECT o FROM Opportunity o
 WHERE o.active = true
-AND (:category IS NULL OR o.category = :category)
-AND (
-    :format IS NULL
-    OR LOWER(TRIM(o.typeDetail)) = LOWER(TRIM(:format))
-)
+AND (:category IS NULL OR LOWER(TRIM(o.category)) = LOWER(TRIM(:category)))
+AND (:format IS NULL OR LOWER(TRIM(o.typeDetail)) = LOWER(TRIM(:format)))
 AND (
     :search IS NULL
     OR LOWER(o.title) LIKE CONCAT('%', LOWER(CAST(:search AS string)), '%')
@@ -38,10 +35,11 @@ ORDER BY
 CASE WHEN o.deadline IS NULL THEN 1 ELSE 0 END,
 o.deadline ASC
 """)
-    List<Opportunity> searchOpportunities(
+    Page<Opportunity> searchOpportunities(
             @Param("search") String search,
             @Param("category") String category,
-            @Param("format") String format
+            @Param("format") String format,
+            Pageable pageable
     );
 
     @Query("""

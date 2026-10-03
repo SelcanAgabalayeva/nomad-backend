@@ -7,6 +7,7 @@ import nomad.example.nomad_backend.enums.OpportunityScope;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+
 @Entity
 @Table(name = "opportunities")
 @Getter
@@ -33,54 +34,59 @@ public class Opportunity {
 
     @Column(length = 2000)
     private String sumEn;
+
     @Column(length = 2000)
     private String sumRus;
 
-    // Sheet-də "Növü"
     private String typeDetail;
 
     private String country;
+
     private String applyLink;
+
     @Column(name = "opening_date")
     private LocalDate openingDate;
+
     @Column(unique = true)
     private String uniqueKey;
 
     private String duration;
+
     private String language;
 
-
     private String city;
+
     private String escOrSalto;
 
     @Column(length = 1000)
     private String eventDateRange;
 
-
     @Column(length = 1000)
     private String financialSupport;
-
 
     @Column(length = 1000)
     private String ageRequirement;
 
-
     @Column(length = 1000)
     private String volunteeringType;
+
+    @Builder.Default
     private boolean active = true;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private OpportunityStatus status = OpportunityStatus.READY;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "scope")
     private OpportunityScope scope;
 
-    @ManyToOne
+    // LAZY ƏLAVƏ EDİLDİ - N+1 sorğu problemini aradan qaldırır
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id")
     private Organization organization;
-
-
 }
 

@@ -66,7 +66,7 @@ public class SecurityConfig {
                                 "/api/organizations/**",
                                 "/api/v1/test-email",
                                 "/api/radio",
-                                "/api/mundus-programs"
+                                "/api/mundus-programs/**"
                         ).permitAll()
 
                         .requestMatchers(

@@ -63,11 +63,13 @@ public class MundusProgramController {
             @PathVariable Long id,
             @RequestBody MundusProgramRequest request
     ) {
+        MundusProgram updated =
+                mundusProgramService.update(id, request);
 
-        return ResponseEntity.ok(
-                mundusProgramService.update(id, request)
-        );
+        return ResponseEntity.ok(updated);
     }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(

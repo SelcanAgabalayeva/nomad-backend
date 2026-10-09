@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,19 +70,115 @@ public class MundusProgramService {
         return repository.save(program);
     }
 
-    public MundusProgram update(Long id, MundusProgramRequest request) {
-        validateRequest(request);
-
+    @Transactional
+    public MundusProgram update(
+            Long id,
+            MundusProgramRequest request
+    ) {
         MundusProgram program = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Mundus proqramı tapılmadı: " + id
                 ));
 
-        copyRequestToEntity(request, program);
+        if (request == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Sorğu məlumatları boş ola bilməz"
+            );
+        }
+
+        if (request.getProgramName() == null
+                || request.getProgramName().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Proqramın adı boş ola bilməz"
+            );
+        }
+
+        if (request.getDeadline() != null
+                && request.getApplicationOpens() != null
+                && request.getDeadline()
+                .isBefore(request.getApplicationOpens())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Son müraciət tarixi müraciətin başlanğıcından əvvəl ola bilməz"
+            );
+        }
+
+        if (request.getIeltsScore() != null
+                && (request.getIeltsScore() < 0
+                || request.getIeltsScore() > 9)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "IELTS balı 0-9 aralığında olmalıdır"
+            );
+        }
+
+        if (request.getToeflScore() != null
+                && (request.getToeflScore() < 0
+                || request.getToeflScore() > 120)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "TOEFL balı 0-120 aralığında olmalıdır"
+            );
+        }
+
+        program.setProgramName(request.getProgramName().trim());
+        program.setDescription(request.getDescription());
+        program.setCategory(request.getCategory());
+        program.setFieldOfStudy(request.getFieldOfStudy());
+
+        program.setCountries(cleanList(request.getCountries()));
+        program.setUniversities(cleanList(request.getUniversities()));
+        program.setBachelorFields(cleanList(request.getBachelorFields()));
+        program.setRequiredDocuments(cleanList(request.getRequiredDocuments()));
+
+        program.setDegree(request.getDegree());
+        program.setDuration(request.getDuration());
+        program.setLanguage(request.getLanguage());
+
+        program.setDeadline(request.getDeadline());
+        program.setApplicationOpens(request.getApplicationOpens());
+        program.setIntake(request.getIntake());
+
+        program.setIeltsRequirement(request.getIeltsRequirement());
+        program.setIeltsScore(request.getIeltsScore());
+        program.setIeltsRequired(
+                Boolean.TRUE.equals(request.getIeltsRequired())
+        );
+
+        program.setToeflRequirement(request.getToeflRequirement());
+        program.setToeflScore(request.getToeflScore());
+
+        program.setScholarship(
+                Boolean.TRUE.equals(request.getScholarship())
+        );
+        program.setScholarshipAmount(request.getScholarshipAmount());
+        program.setApplicationFee(request.getApplicationFee());
+
+        program.setOfficialWebsite(request.getOfficialWebsite());
+        program.setApplyLink(request.getApplyLink());
+
+        if (request.getActive() != null) {
+            program.setActive(request.getActive());
+        }
 
         return repository.save(program);
     }
+
+    private List<String> cleanList(List<String> values) {
+        if (values == null) {
+            return new ArrayList<>();
+        }
+
+        return values.stream()
+                .filter(value -> value != null && !value.isBlank())
+                .map(String::trim)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+
     public void toggleActive(Long id) {
         MundusProgram program = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(

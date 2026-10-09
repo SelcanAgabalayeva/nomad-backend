@@ -8,6 +8,7 @@ import nomad.example.nomad_backend.entity.Opportunity;
 import nomad.example.nomad_backend.entity.User;
 import nomad.example.nomad_backend.entity.UserProject;
 import nomad.example.nomad_backend.entity.ProjectStatus;
+import nomad.example.nomad_backend.repository.MundusProgramRepository;
 import nomad.example.nomad_backend.repository.OpportunityRepository;
 import nomad.example.nomad_backend.repository.ProjectRepository;
 import nomad.example.nomad_backend.repository.UserRepository;
@@ -37,6 +38,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final DurationTypeService durationTypeService;
     private final VisaService visaService;
+    private final MundusProgramRepository mundusProgramRepository;
 
     public List<UserProject> getSavedProjects() {
         return projectRepository.findByStatus(ProjectStatus.SAVED);
@@ -225,14 +227,28 @@ public class ProjectService {
     }
 
     public PlatformStatsResponse getPlatformStatistics() {
-        long activeCount = opportunityRepository.countByActiveTrueAndDeadlineGreaterThanEqual(LocalDate.now());
-        long categoriesCount = opportunityRepository.countDistinctCategories();
+
+        long opportunityCount =
+                opportunityRepository
+                        .countByActiveTrueAndDeadlineGreaterThanEqual(
+                                LocalDate.now()
+                        );
+
+        long mundusCount =
+                mundusProgramRepository.countByActiveTrue();
+
+        long totalCount = opportunityCount + mundusCount;
+
+        long categoriesCount =
+                opportunityRepository.countDistinctCategories();
 
         return PlatformStatsResponse.builder()
-                .activeOpportunities(activeCount + "+")
+                .activeOpportunities(totalCount + "+")
                 .servicesCount("10+")
                 .availability("7/24")
                 .categoriesCount(categoriesCount)
                 .build();
     }
+
+
 }

@@ -32,5 +32,5 @@ public interface MundusProgramRepository
     WHERE p.id = :id AND p.active = true
 """)
     int incrementApplicationClickCount(@Param("id") Long id);
-
+    long countByActiveTrue();
 }

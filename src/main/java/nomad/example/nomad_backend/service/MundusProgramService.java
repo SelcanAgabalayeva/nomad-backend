@@ -82,7 +82,16 @@ public class MundusProgramService {
 
         return repository.save(program);
     }
+    public void toggleActive(Long id) {
+        MundusProgram program = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Mundus proqramı tapılmadı: " + id
+                ));
 
+        program.setActive(!Boolean.TRUE.equals(program.getActive()));
+        repository.save(program);
+    }
     public void delete(Long id) {
         MundusProgram program = repository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(

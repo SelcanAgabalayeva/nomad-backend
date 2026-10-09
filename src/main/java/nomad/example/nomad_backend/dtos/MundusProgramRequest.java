@@ -1,4 +1,5 @@
 package nomad.example.nomad_backend.dtos;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -32,8 +33,9 @@ public class MundusProgramRequest {
     private String degree;
     private String duration;
     private String language;
-
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deadline;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate applicationOpens;
 
     private String intake;

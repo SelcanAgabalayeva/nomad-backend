@@ -194,4 +194,9 @@ public class MundusProgramController {
                 )
         );
     }
+    @PatchMapping("/{id}/toggle-active")
+    public ResponseEntity<Void> toggleActive(@PathVariable Long id) {
+        mundusProgramService.toggleActive(id);
+        return ResponseEntity.noContent().build();
+    }
 }

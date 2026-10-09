@@ -37,4 +37,5 @@ public class OrganizationResponse {
     private Double rating;
     private Long reviewCount;
     private long activeOpportunityCount;
+
 }

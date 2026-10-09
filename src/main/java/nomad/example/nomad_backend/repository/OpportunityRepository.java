@@ -62,4 +62,5 @@ o.deadline ASC
             OpportunityScope scope
     );
     long countByOrganizationIdAndActiveTrue(Long organizationId);
+
 }

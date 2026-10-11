@@ -62,5 +62,9 @@ o.deadline ASC
             OpportunityScope scope
     );
     long countByOrganizationIdAndActiveTrue(Long organizationId);
+    // Aktiv imkanlar (deadline bugündən böyük və ya bərabər olanlar)
+    List<Opportunity> findAllByOrganizationIdAndActiveTrueAndDeadlineGreaterThanEqual(Long organizationId, LocalDate date);
 
+    // Keçmiş/bitmiş imkanlar (deadline bugündən kiçik olanlar)
+    List<Opportunity> findAllByOrganizationIdAndActiveTrueAndDeadlineLessThan(Long organizationId, LocalDate date);
 }

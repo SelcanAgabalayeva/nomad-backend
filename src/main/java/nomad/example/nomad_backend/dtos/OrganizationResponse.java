@@ -37,5 +37,7 @@ public class OrganizationResponse {
     private Double rating;
     private Long reviewCount;
     private long activeOpportunityCount;
-
+    private List<OpportunityCardResponse> activeOpportunities;
+    private List<OpportunityCardResponse> pastOpportunities;
+    private List<String> galleryImages; // Qalereya şəkillərinin URL-ləri
 }

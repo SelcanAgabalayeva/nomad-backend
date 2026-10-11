@@ -3,6 +3,7 @@ package nomad.example.nomad_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -50,4 +51,8 @@ public class Organization {
     private String logo;
     @OneToMany(mappedBy = "organization")
     private List<Opportunity> opportunities;
+    @ElementCollection
+    @CollectionTable(name = "organization_gallery", joinColumns = @JoinColumn(name = "organization_id"))
+    @Column(name = "image_url")
+    private List<String> galleryImages = new ArrayList<>();
 }

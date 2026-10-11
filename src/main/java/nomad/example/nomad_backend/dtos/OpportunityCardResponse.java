@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nomad.example.nomad_backend.entity.DurationType;
 import nomad.example.nomad_backend.entity.VisaType;
+import nomad.example.nomad_backend.enums.OpportunityScope;
 
 import java.time.LocalDate;
 
@@ -35,5 +36,6 @@ public class OpportunityCardResponse {
     private DurationType durationType;
     private String description;
     private VisaType visaType;
+    private OpportunityScope scope;
 
 }

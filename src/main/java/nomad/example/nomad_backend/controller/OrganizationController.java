@@ -1,6 +1,7 @@
 package nomad.example.nomad_backend.controller;
 
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.OpportunityCardResponse;
 import nomad.example.nomad_backend.dtos.OrganizationRatingRequest;
 import nomad.example.nomad_backend.dtos.OrganizationResponse;
 import nomad.example.nomad_backend.entity.Organization;
@@ -76,5 +77,44 @@ public class OrganizationController {
         organizationService.deleteOrganization(slug);
 
         return ResponseEntity.noContent().build();
+    }
+
+    // Bütün qalereya şəkillərini massiv (List) şəklində yeniləmək
+    @PutMapping("/{slug}/gallery")
+    public ResponseEntity<Void> updateGalleryImages(
+            @PathVariable String slug,
+            @RequestBody List<String> imageUrls
+    ) {
+        organizationService.updateGalleryImages(slug, imageUrls);
+        return ResponseEntity.ok().build();
+    }
+
+    // Qalereyadan tək bir şəkli silmək
+    @DeleteMapping("/{slug}/gallery")
+    public ResponseEntity<Void> removeGalleryImage(
+            @PathVariable String slug,
+            @RequestParam String imageUrl
+    ) {
+        organizationService.removeGalleryImage(slug, imageUrl);
+        return ResponseEntity.noContent().build();
+    }
+    // POST metodu ilə çoxlu şəkil (List) əlavə etmək
+    @PostMapping("/{slug}/gallery/batch")
+    public ResponseEntity<Void> addGalleryImagesBatch(
+            @PathVariable String slug,
+            @RequestBody List<String> imageUrls
+    ) {
+        organizationService.addGalleryImagesBatch(slug, imageUrls);
+        return ResponseEntity.ok().build();
+    }
+    // Təşkilatın deadline-ı bitmiş (keçmiş) layihələrini gətirmək üçün
+    @GetMapping("/{slug}/past-opportunities")
+    public ResponseEntity<List<OpportunityCardResponse>> getPastOpportunities(
+            @PathVariable String slug,
+            @RequestParam(required = false) Long userId
+    ) {
+        return ResponseEntity.ok(
+                organizationService.getPastOpportunities(slug, userId)
+        );
     }
 }

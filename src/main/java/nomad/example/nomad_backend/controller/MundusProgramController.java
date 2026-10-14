@@ -20,16 +20,36 @@ public class MundusProgramController {
 
     private final MundusInteractionService mundusInteractionService;
 
+
     @GetMapping
     public ResponseEntity<List<MundusProgram>> getAll(
             @RequestParam(defaultValue = "false")
             boolean includeInactive
     ) {
+        long start = System.nanoTime();
 
-        return ResponseEntity.ok(
-                mundusProgramService.getAll(includeInactive)
-        );
+        try {
+            List<MundusProgram> programs =
+                    mundusProgramService.getAll(includeInactive);
+
+            System.out.println(
+                    "[PERF] Controller: proqram sayı = "
+                            + programs.size()
+            );
+
+            return ResponseEntity.ok(programs);
+
+        } finally {
+            long elapsedMs =
+                    (System.nanoTime() - start) / 1_000_000;
+
+            System.out.println(
+                    "[PERF] Controller getAll: "
+                            + elapsedMs + " ms"
+            );
+        }
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<MundusProgram> getById(
             @PathVariable Long id

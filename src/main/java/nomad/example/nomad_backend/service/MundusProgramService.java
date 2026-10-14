@@ -19,14 +19,46 @@ import java.util.stream.Collectors;
 public class MundusProgramService {
     private final MundusProgramRepository repository;
 
+
     @Transactional(readOnly = true)
     public List<MundusProgram> getAll(boolean includeInactive) {
-        if (includeInactive) {
-            return repository.findAllByOrderByCreatedAtDesc();
-        }
+        long serviceStart = System.nanoTime();
+        long repositoryStart = System.nanoTime();
 
-        return repository.findAllByActiveTrueOrderByDeadlineAsc();
+        try {
+            List<MundusProgram> programs;
+
+            if (includeInactive) {
+                programs = repository.findAllByOrderByCreatedAtDesc();
+            } else {
+                programs = repository.findAllByActiveTrueOrderByDeadlineAsc();
+            }
+
+            long repositoryMs =
+                    (System.nanoTime() - repositoryStart) / 1_000_000;
+
+            System.out.println(
+                    "[PERF] Repository query: "
+                            + repositoryMs + " ms"
+            );
+
+            System.out.println(
+                    "[PERF] Programs returned: " + programs.size()
+            );
+
+            return programs;
+
+        } finally {
+            long serviceMs =
+                    (System.nanoTime() - serviceStart) / 1_000_000;
+
+            System.out.println(
+                    "[PERF] Service getAll total: "
+                            + serviceMs + " ms"
+            );
+        }
     }
+
 
     @Transactional(readOnly = true)
     public MundusProgram getById(Long id) {

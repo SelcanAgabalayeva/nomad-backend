@@ -33,7 +33,7 @@ public class MundusProgramController {
                     mundusProgramService.getAll(includeInactive);
 
             System.out.println(
-                    "[PERF] Controller: proqram sayı = "
+                    "[PERF] Controller: proqrams sayı = "
                             + programs.size()
             );
 

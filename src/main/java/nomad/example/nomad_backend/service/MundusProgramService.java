@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,57 +30,45 @@ public class MundusProgramService {
             boolean includeInactive,
             Pageable pageable
     ) {
-        if (includeInactive) {
-            return repository.findAllList(pageable);
+        Page<MundusProgramListDTO> page = includeInactive
+                ? repository.findAllList(pageable)
+                : repository.findActiveList(pageable);
+
+        List<MundusProgramListDTO> programs = page.getContent();
+
+        if (programs.isEmpty()) {
+            return page;
         }
 
-        return repository.findActiveList(pageable);
+        List<Long> ids = programs.stream()
+                .map(MundusProgramListDTO::getId)
+                .toList();
+
+        List<Object[]> countryRows =
+                repository.findCountriesByProgramIds(ids);
+
+        Map<Long, List<String>> countriesMap = new HashMap<>();
+
+        for (Object[] row : countryRows) {
+            Long programId = (Long) row[0];
+            String country = (String) row[1];
+
+            countriesMap
+                    .computeIfAbsent(programId, k -> new ArrayList<>())
+                    .add(country);
+        }
+
+        for (MundusProgramListDTO program : programs) {
+            program.setCountries(
+                    countriesMap.getOrDefault(
+                            program.getId(),
+                            new ArrayList<>()
+                    )
+            );
+        }
+
+        return page;
     }
-
-    private MundusProgramDTO toDTO(MundusProgram p) {
-        return MundusProgramDTO.builder()
-                .id(p.getId())
-                .programName(p.getProgramName())
-                .description(p.getDescription())
-                .category(p.getCategory())
-                .fieldOfStudy(p.getFieldOfStudy())
-
-                .countries(p.getCountries())
-                .universities(p.getUniversities())
-                .bachelorFields(p.getBachelorFields())
-                .requiredDocuments(p.getRequiredDocuments())
-
-                .degree(p.getDegree())
-                .duration(p.getDuration())
-                .language(p.getLanguage())
-
-                .deadline(p.getDeadline())
-                .applicationOpens(p.getApplicationOpens())
-                .intake(p.getIntake())
-
-                .ieltsRequirement(p.getIeltsRequirement())
-                .ieltsScore(p.getIeltsScore())
-                .ieltsRequired(p.getIeltsRequired())
-
-                .toeflRequirement(p.getToeflRequirement())
-                .toeflScore(p.getToeflScore())
-
-                .scholarship(p.getScholarship())
-                .scholarshipAmount(p.getScholarshipAmount())
-                .applicationFee(p.getApplicationFee())
-
-                .officialWebsite(p.getOfficialWebsite())
-                .applyLink(p.getApplyLink())
-
-                .active(p.getActive())
-                .viewCount(p.getViewCount())
-                .applicationClickCount(p.getApplicationClickCount())
-
-                .createdAt(p.getCreatedAt())
-                .updatedAt(p.getUpdatedAt())
-                .build();
-    }
-
 
     @Transactional(readOnly = true)
     public MundusProgram getById(Long id) {

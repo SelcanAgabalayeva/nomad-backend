@@ -25,6 +25,7 @@ public interface MundusProgramRepository
         p.deadline,
         p.applicationOpens,
         p.scholarship,
+        p.applyLink,
         p.scholarshipAmount
     )
     FROM MundusProgram p
@@ -43,6 +44,7 @@ public interface MundusProgramRepository
             p.deadline,
             p.applicationOpens,
             p.scholarship,
+            p.applyLink,
             p.scholarshipAmount
         )
         FROM MundusProgram p
@@ -70,4 +72,13 @@ public interface MundusProgramRepository
 """)
     int incrementApplicationClickCount(@Param("id") Long id);
     long countByActiveTrue();
+    @Query("""
+    SELECT p.id, c
+    FROM MundusProgram p
+    JOIN p.countries c
+    WHERE p.id IN :ids
+""")
+    List<Object[]> findCountriesByProgramIds(
+            @Param("ids") List<Long> ids
+    );
 }

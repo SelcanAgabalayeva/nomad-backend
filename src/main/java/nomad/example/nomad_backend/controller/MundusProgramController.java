@@ -1,11 +1,11 @@
 package nomad.example.nomad_backend.controller;
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.MundusProgramListDto;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.dtos.MundusUserStatusResponse;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.service.MundusInteractionService;
 import nomad.example.nomad_backend.service.MundusProgramService;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -21,26 +21,16 @@ public class MundusProgramController {
 
     private final MundusInteractionService mundusInteractionService;
 
-
     @GetMapping
-    public ResponseEntity<Page<MundusProgram>> getAll(
+    public ResponseEntity<List<MundusProgramListDto>> getAll(
             @RequestParam(defaultValue = "false")
-            boolean includeInactive,
-
-            @RequestParam(defaultValue = "0")
-            int page,
-
-            @RequestParam(defaultValue = "10")
-            int size
+            boolean includeInactive
     ) {
         return ResponseEntity.ok(
-                mundusProgramService.getAll(
-                        includeInactive,
-                        page,
-                        size
-                )
+                mundusProgramService.getAll(includeInactive)
         );
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<MundusProgram> getById(
             @PathVariable Long id

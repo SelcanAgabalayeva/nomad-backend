@@ -1,12 +1,10 @@
 package nomad.example.nomad_backend.service;
 
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.MundusProgramListDto;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.repository.MundusProgramRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,21 +21,28 @@ public class MundusProgramService {
     private final MundusProgramRepository repository;
 
     @Transactional(readOnly = true)
-    public Page<MundusProgram> getAll(
-            boolean includeInactive,
-            int page,
-            int size
-    ) {
-        int safePage = Math.max(page, 0);
-        int safeSize = Math.max(1, Math.min(size, 50));
+    public List<MundusProgramListDto> getAll(boolean includeInactive) {
 
-        Pageable pageable = PageRequest.of(safePage, safeSize);
+        List<MundusProgram> programs;
 
         if (includeInactive) {
-            return repository.findAllByOrderByCreatedAtDesc(pageable);
+            programs = repository.findAllByOrderByCreatedAtDesc();
+        } else {
+            programs = repository.findAllByActiveTrueOrderByDeadlineAsc();
         }
 
-        return repository.findAllByActiveTrueOrderByDeadlineAsc(pageable);
+        return programs.stream()
+                .map(p -> new MundusProgramListDto(
+                        p.getId(),
+                        p.getProgramName(),
+                        p.getCategory(),
+                        p.getFieldOfStudy(),
+                        p.getDegree(),
+                        p.getDeadline(),
+                        p.getScholarship(),
+                        p.getActive()
+                ))
+                .toList();
     }
 
     @Transactional(readOnly = true)

@@ -2,6 +2,7 @@ package nomad.example.nomad_backend.service;
 
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.MundusProgramDto;
+import nomad.example.nomad_backend.dtos.MundusProgramListDto;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.repository.MundusProgramRepository;
@@ -19,51 +20,16 @@ import java.util.stream.Collectors;
 @Transactional
 public class MundusProgramService {
     private final MundusProgramRepository repository;
+
     @Transactional(readOnly = true)
-    public List<MundusProgramDto> getAll(boolean includeInactive) {
-
-        List<MundusProgram> programs;
-
+    public List<MundusProgramListDto> getAll(
+            boolean includeInactive
+    ) {
         if (includeInactive) {
-            programs = repository.findAllByOrderByCreatedAtDesc();
-        } else {
-            programs = repository.findAllByActiveTrueOrderByDeadlineAsc();
+            return repository.findAllProgramSummaries();
         }
 
-        return programs.stream()
-                .map(p -> new MundusProgramDto(
-                        p.getId(),
-                        p.getProgramName(),
-                        p.getDescription(),
-                        p.getCategory(),
-                        p.getFieldOfStudy(),
-                        p.getCountries(),
-                        p.getUniversities(),
-                        p.getBachelorFields(),
-                        p.getRequiredDocuments(),
-                        p.getDegree(),
-                        p.getDuration(),
-                        p.getLanguage(),
-                        p.getDeadline(),
-                        p.getApplicationOpens(),
-                        p.getIntake(),
-                        p.getIeltsRequirement(),
-                        p.getIeltsScore(),
-                        p.getIeltsRequired(),
-                        p.getToeflRequirement(),
-                        p.getToeflScore(),
-                        p.getScholarship(),
-                        p.getScholarshipAmount(),
-                        p.getApplicationFee(),
-                        p.getOfficialWebsite(),
-                        p.getApplyLink(),
-                        p.getActive(),
-                        p.getViewCount(),
-                        p.getApplicationClickCount(),
-                        p.getCreatedAt(),
-                        p.getUpdatedAt()
-                ))
-                .toList();
+        return repository.findActiveProgramSummaries();
     }
 
     @Transactional(readOnly = true)

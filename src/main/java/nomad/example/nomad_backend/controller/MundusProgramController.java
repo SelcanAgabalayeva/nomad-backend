@@ -1,6 +1,7 @@
 package nomad.example.nomad_backend.controller;
 import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.MundusProgramDto;
+import nomad.example.nomad_backend.dtos.MundusProgramListDto;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.dtos.MundusUserStatusResponse;
 import nomad.example.nomad_backend.entity.MundusProgram;
@@ -20,9 +21,8 @@ public class MundusProgramController {
     private final MundusProgramService mundusProgramService;
 
     private final MundusInteractionService mundusInteractionService;
-
     @GetMapping
-    public ResponseEntity<List<MundusProgramDto>> getAll(
+    public ResponseEntity<List<MundusProgramListDto>> getAll(
             @RequestParam(defaultValue = "false")
             boolean includeInactive
     ) {
@@ -30,6 +30,7 @@ public class MundusProgramController {
                 mundusProgramService.getAll(includeInactive)
         );
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<MundusProgram> getById(

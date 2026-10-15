@@ -1,5 +1,8 @@
 package nomad.example.nomad_backend.repository;
+import nomad.example.nomad_backend.dtos.MundusProgramListDTO;
 import nomad.example.nomad_backend.entity.MundusProgram;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +15,40 @@ import java.util.List;
 public interface MundusProgramRepository
         extends JpaRepository<MundusProgram, Long> {
 
+    @Query("""
+    SELECT new nomad.example.nomad_backend.dtos.MundusProgramListDTO(
+        p.id,
+        p.programName,
+        p.category,
+        p.fieldOfStudy,
+        p.degree,
+        p.deadline,
+        p.applicationOpens,
+        p.scholarship,
+        p.scholarshipAmount
+    )
+    FROM MundusProgram p
+    WHERE p.active = true
+    ORDER BY p.deadline ASC
+""")
+    Page<MundusProgramListDTO> findActiveList(Pageable pageable);
+
+    @Query("""
+        SELECT new nomad.example.nomad_backend.dtos.MundusProgramListDTO(
+            p.id,
+            p.programName,
+            p.category,
+            p.fieldOfStudy,
+            p.degree,
+            p.deadline,
+            p.applicationOpens,
+            p.scholarship,
+            p.scholarshipAmount
+        )
+        FROM MundusProgram p
+        ORDER BY p.createdAt DESC
+    """)
+    Page<MundusProgramListDTO> findAllList(Pageable pageable);
     List<MundusProgram> findAllByActiveTrueOrderByDeadlineAsc();
 
     List<MundusProgram> findAllByOrderByCreatedAtDesc();

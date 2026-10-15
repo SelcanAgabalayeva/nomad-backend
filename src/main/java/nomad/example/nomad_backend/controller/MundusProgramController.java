@@ -1,10 +1,15 @@
 package nomad.example.nomad_backend.controller;
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.MundusProgramDTO;
+import nomad.example.nomad_backend.dtos.MundusProgramListDTO;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.dtos.MundusUserStatusResponse;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.service.MundusInteractionService;
 import nomad.example.nomad_backend.service.MundusProgramService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,16 +25,18 @@ public class MundusProgramController {
 
     private final MundusInteractionService mundusInteractionService;
 
-    @GetMapping
-    public ResponseEntity<List<MundusProgram>> getAll(
-            @RequestParam(defaultValue = "false")
-            boolean includeInactive
-    ) {
 
+    @GetMapping
+    public ResponseEntity<Page<MundusProgramListDTO>> getAll(
+            @RequestParam(defaultValue = "false") boolean includeInactive,
+            @PageableDefault(size = 20) Pageable pageable
+    ) {
         return ResponseEntity.ok(
-                mundusProgramService.getAll(includeInactive)
+                mundusProgramService.getAll(includeInactive, pageable)
         );
     }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<MundusProgram> getById(
             @PathVariable Long id

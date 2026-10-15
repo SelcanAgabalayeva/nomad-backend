@@ -1,9 +1,13 @@
 package nomad.example.nomad_backend.service;
 
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.MundusProgramDTO;
+import nomad.example.nomad_backend.dtos.MundusProgramListDTO;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.repository.MundusProgramRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +24,61 @@ public class MundusProgramService {
     private final MundusProgramRepository repository;
 
     @Transactional(readOnly = true)
-    public List<MundusProgram> getAll(boolean includeInactive) {
+    public Page<MundusProgramListDTO> getAll(
+            boolean includeInactive,
+            Pageable pageable
+    ) {
         if (includeInactive) {
-            return repository.findAllByOrderByCreatedAtDesc();
+            return repository.findAllList(pageable);
         }
 
-        return repository.findAllByActiveTrueOrderByDeadlineAsc();
+        return repository.findActiveList(pageable);
     }
+
+    private MundusProgramDTO toDTO(MundusProgram p) {
+        return MundusProgramDTO.builder()
+                .id(p.getId())
+                .programName(p.getProgramName())
+                .description(p.getDescription())
+                .category(p.getCategory())
+                .fieldOfStudy(p.getFieldOfStudy())
+
+                .countries(p.getCountries())
+                .universities(p.getUniversities())
+                .bachelorFields(p.getBachelorFields())
+                .requiredDocuments(p.getRequiredDocuments())
+
+                .degree(p.getDegree())
+                .duration(p.getDuration())
+                .language(p.getLanguage())
+
+                .deadline(p.getDeadline())
+                .applicationOpens(p.getApplicationOpens())
+                .intake(p.getIntake())
+
+                .ieltsRequirement(p.getIeltsRequirement())
+                .ieltsScore(p.getIeltsScore())
+                .ieltsRequired(p.getIeltsRequired())
+
+                .toeflRequirement(p.getToeflRequirement())
+                .toeflScore(p.getToeflScore())
+
+                .scholarship(p.getScholarship())
+                .scholarshipAmount(p.getScholarshipAmount())
+                .applicationFee(p.getApplicationFee())
+
+                .officialWebsite(p.getOfficialWebsite())
+                .applyLink(p.getApplyLink())
+
+                .active(p.getActive())
+                .viewCount(p.getViewCount())
+                .applicationClickCount(p.getApplicationClickCount())
+
+                .createdAt(p.getCreatedAt())
+                .updatedAt(p.getUpdatedAt())
+                .build();
+    }
+
 
     @Transactional(readOnly = true)
     public MundusProgram getById(Long id) {

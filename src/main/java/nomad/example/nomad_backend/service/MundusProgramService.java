@@ -1,6 +1,7 @@
 package nomad.example.nomad_backend.service;
 
 import lombok.RequiredArgsConstructor;
+import nomad.example.nomad_backend.dtos.MundusProgramDTO;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.repository.MundusProgramRepository;
@@ -20,12 +21,46 @@ public class MundusProgramService {
     private final MundusProgramRepository repository;
 
     @Transactional(readOnly = true)
-    public List<MundusProgram> getAll(boolean includeInactive) {
-        if (includeInactive) {
-            return repository.findAllByOrderByCreatedAtDesc();
-        }
+    public List<MundusProgramDTO> getAll(boolean includeInactive) {
 
-        return repository.findAllByActiveTrueOrderByDeadlineAsc();
+        List<MundusProgram> programs = includeInactive
+                ? repository.findAllByOrderByCreatedAtDesc()
+                : repository.findActivePrograms();
+
+        return programs.stream()
+                .map(p -> MundusProgramDTO.builder()
+                        .id(p.getId())
+                        .programName(p.getProgramName())
+                        .description(p.getDescription())
+                        .category(p.getCategory())
+                        .fieldOfStudy(p.getFieldOfStudy())
+                        .countries(p.getCountries())
+                        .universities(p.getUniversities())
+                        .bachelorFields(p.getBachelorFields())
+                        .requiredDocuments(p.getRequiredDocuments())
+                        .degree(p.getDegree())
+                        .duration(p.getDuration())
+                        .language(p.getLanguage())
+                        .deadline(p.getDeadline())
+                        .applicationOpens(p.getApplicationOpens())
+                        .intake(p.getIntake())
+                        .ieltsRequirement(p.getIeltsRequirement())
+                        .ieltsScore(p.getIeltsScore())
+                        .ieltsRequired(p.getIeltsRequired())
+                        .toeflRequirement(p.getToeflRequirement())
+                        .toeflScore(p.getToeflScore())
+                        .scholarship(p.getScholarship())
+                        .scholarshipAmount(p.getScholarshipAmount())
+                        .applicationFee(p.getApplicationFee())
+                        .officialWebsite(p.getOfficialWebsite())
+                        .applyLink(p.getApplyLink())
+                        .active(p.getActive())
+                        .viewCount(p.getViewCount())
+                        .applicationClickCount(p.getApplicationClickCount())
+                        .createdAt(p.getCreatedAt())
+                        .updatedAt(p.getUpdatedAt())
+                        .build())
+                .toList();
     }
 
     @Transactional(readOnly = true)

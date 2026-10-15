@@ -12,7 +12,12 @@ import java.util.List;
 public interface MundusProgramRepository
         extends JpaRepository<MundusProgram, Long> {
 
-    List<MundusProgram> findAllByActiveTrueOrderByDeadlineAsc();
+    @Query("""
+        SELECT p FROM MundusProgram p
+        WHERE p.active = true
+        ORDER BY p.deadline ASC
+    """)
+    List<MundusProgram> findActivePrograms();
 
     List<MundusProgram> findAllByOrderByCreatedAtDesc();
 

@@ -1,8 +1,6 @@
 package nomad.example.nomad_backend.service;
 
 import lombok.RequiredArgsConstructor;
-import nomad.example.nomad_backend.dtos.MundusProgramDto;
-import nomad.example.nomad_backend.dtos.MundusProgramListDto;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.repository.MundusProgramRepository;
@@ -22,14 +20,12 @@ public class MundusProgramService {
     private final MundusProgramRepository repository;
 
     @Transactional(readOnly = true)
-    public List<MundusProgramListDto> getAll(
-            boolean includeInactive
-    ) {
+    public List<MundusProgram> getAll(boolean includeInactive) {
         if (includeInactive) {
-            return repository.findAllProgramSummaries();
+            return repository.findAllByOrderByCreatedAtDesc();
         }
 
-        return repository.findActiveProgramSummaries();
+        return repository.findAllByActiveTrueOrderByDeadlineAsc();
     }
 
     @Transactional(readOnly = true)

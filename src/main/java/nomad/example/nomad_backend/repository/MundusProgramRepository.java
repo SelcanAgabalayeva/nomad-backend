@@ -1,5 +1,4 @@
 package nomad.example.nomad_backend.repository;
-import nomad.example.nomad_backend.dtos.MundusProgramListDto;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,39 +12,9 @@ import java.util.List;
 public interface MundusProgramRepository
         extends JpaRepository<MundusProgram, Long> {
 
-    @Query("""
-    SELECT new nomad.example.nomad_backend.dto.MundusProgramListDto(
-        p.id,
-        p.programName,
-        p.category,
-        p.fieldOfStudy,
-        p.degree,
-        p.deadline,
-        p.scholarship,
-        p.active
-    )
-    FROM MundusProgram p
-    WHERE p.active = true
-    ORDER BY p.deadline ASC
-""")
-    List<MundusProgramListDto> findActiveProgramSummaries();
+    List<MundusProgram> findAllByActiveTrueOrderByDeadlineAsc();
 
-    @Query("""
-    SELECT new nomad.example.nomad_backend.dto.MundusProgramListDto(
-        p.id,
-        p.programName,
-        p.category,
-        p.fieldOfStudy,
-        p.degree,
-        p.deadline,
-        p.scholarship,
-        p.active
-    )
-    FROM MundusProgram p
-    ORDER BY p.createdAt DESC
-""")
-    List<MundusProgramListDto> findAllProgramSummaries();
-
+    List<MundusProgram> findAllByOrderByCreatedAtDesc();
 
     @Modifying
     @Query("""

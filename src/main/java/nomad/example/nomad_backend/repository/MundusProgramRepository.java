@@ -5,32 +5,39 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 @Repository
 public interface MundusProgramRepository
         extends JpaRepository<MundusProgram, Long> {
 
-    List<MundusProgram> findAllByActiveTrueOrderByDeadlineAsc();
+    Page<MundusProgram> findAllByActiveTrueOrderByDeadlineAsc(
+            Pageable pageable
+    );
 
-    List<MundusProgram> findAllByOrderByCreatedAtDesc();
+    Page<MundusProgram> findAllByOrderByCreatedAtDesc(
+            Pageable pageable
+    );
 
     @Modifying
     @Query("""
-    UPDATE MundusProgram p
-    SET p.viewCount = COALESCE(p.viewCount, 0) + 1
-    WHERE p.id = :id AND p.active = true
-""")
+        UPDATE MundusProgram p
+        SET p.viewCount = COALESCE(p.viewCount, 0) + 1
+        WHERE p.id = :id AND p.active = true
+    """)
     int incrementViewCount(@Param("id") Long id);
 
     @Modifying
     @Query("""
-    UPDATE MundusProgram p
-    SET p.applicationClickCount =
-        COALESCE(p.applicationClickCount, 0) + 1
-    WHERE p.id = :id AND p.active = true
-""")
+        UPDATE MundusProgram p
+        SET p.applicationClickCount =
+            COALESCE(p.applicationClickCount, 0) + 1
+        WHERE p.id = :id AND p.active = true
+    """)
     int incrementApplicationClickCount(@Param("id") Long id);
+
     long countByActiveTrue();
 }
+

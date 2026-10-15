@@ -5,6 +5,7 @@ import nomad.example.nomad_backend.dtos.MundusUserStatusResponse;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.service.MundusInteractionService;
 import nomad.example.nomad_backend.service.MundusProgramService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,34 +23,24 @@ public class MundusProgramController {
 
 
     @GetMapping
-    public ResponseEntity<List<MundusProgram>> getAll(
+    public ResponseEntity<Page<MundusProgram>> getAll(
             @RequestParam(defaultValue = "false")
-            boolean includeInactive
+            boolean includeInactive,
+
+            @RequestParam(defaultValue = "0")
+            int page,
+
+            @RequestParam(defaultValue = "10")
+            int size
     ) {
-        long start = System.nanoTime();
-
-        try {
-            List<MundusProgram> programs =
-                    mundusProgramService.getAll(includeInactive);
-
-            System.out.println(
-                    "[PERF] Controller: proqram sayı = "
-                            + programs.size()
-            );
-
-            return ResponseEntity.ok(programs);
-
-        } finally {
-            long elapsedMs =
-                    (System.nanoTime() - start) / 1_000_000;
-
-            System.out.println(
-                    "[PERF] Controller getAll: "
-                            + elapsedMs + " ms"
-            );
-        }
+        return ResponseEntity.ok(
+                mundusProgramService.getAll(
+                        includeInactive,
+                        page,
+                        size
+                )
+        );
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<MundusProgram> getById(
             @PathVariable Long id

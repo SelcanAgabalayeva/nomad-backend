@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import nomad.example.nomad_backend.dtos.MundusProgramRequest;
 import nomad.example.nomad_backend.entity.MundusProgram;
 import nomad.example.nomad_backend.repository.MundusProgramRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,44 +22,22 @@ import java.util.stream.Collectors;
 public class MundusProgramService {
     private final MundusProgramRepository repository;
 
-
     @Transactional(readOnly = true)
-    public List<MundusProgram> getAll(boolean includeInactive) {
-        long serviceStart = System.nanoTime();
-        long repositoryStart = System.nanoTime();
+    public Page<MundusProgram> getAll(
+            boolean includeInactive,
+            int page,
+            int size
+    ) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.max(1, Math.min(size, 50));
 
-        try {
-            List<MundusProgram> programs;
+        Pageable pageable = PageRequest.of(safePage, safeSize);
 
-            if (includeInactive) {
-                programs = repository.findAllByOrderByCreatedAtDesc();
-            } else {
-                programs = repository.findAllByActiveTrueOrderByDeadlineAsc();
-            }
-
-            long repositoryMs =
-                    (System.nanoTime() - repositoryStart) / 1_000_000;
-
-            System.out.println(
-                    "[PERF] Repository query: "
-                            + repositoryMs + " ms"
-            );
-
-            System.out.println(
-                    "[PERF] Programs returned: " + programs.size()
-            );
-
-            return programs;
-
-        } finally {
-            long serviceMs =
-                    (System.nanoTime() - serviceStart) / 1_000_000;
-
-            System.out.println(
-                    "[PERF] Service getAll total: "
-                            + serviceMs + " ms"
-            );
+        if (includeInactive) {
+            return repository.findAllByOrderByCreatedAtDesc(pageable);
         }
+
+        return repository.findAllByActiveTrueOrderByDeadlineAsc(pageable);
     }
 
     @Transactional(readOnly = true)

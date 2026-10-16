@@ -32,25 +32,26 @@ public interface MundusProgramRepository
     WHERE p.active = true
     ORDER BY p.deadline ASC
 """)
-    Page<MundusProgramListDTO> findActiveList(Pageable pageable);
+    List<MundusProgramListDTO> findActiveList();
+
 
     @Query("""
-        SELECT new nomad.example.nomad_backend.dtos.MundusProgramListDTO(
-            p.id,
-            p.programName,
-            p.category,
-            p.fieldOfStudy,
-            p.degree,
-            p.deadline,
-            p.applicationOpens,
-            p.scholarship,
-            p.applyLink,
-            p.scholarshipAmount
-        )
-        FROM MundusProgram p
-        ORDER BY p.createdAt DESC
-    """)
-    Page<MundusProgramListDTO> findAllList(Pageable pageable);
+    SELECT new nomad.example.nomad_backend.dtos.MundusProgramListDTO(
+        p.id,
+        p.programName,
+        p.category,
+        p.fieldOfStudy,
+        p.degree,
+        p.deadline,
+        p.applicationOpens,
+        p.scholarship,
+        p.applyLink,
+        p.scholarshipAmount
+    )
+    FROM MundusProgram p
+    ORDER BY p.createdAt DESC
+""")
+    List<MundusProgramListDTO> findAllList();
     List<MundusProgram> findAllByActiveTrueOrderByDeadlineAsc();
 
     List<MundusProgram> findAllByOrderByCreatedAtDesc();

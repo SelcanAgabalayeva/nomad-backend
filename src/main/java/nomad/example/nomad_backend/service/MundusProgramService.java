@@ -26,18 +26,14 @@ public class MundusProgramService {
     private final MundusProgramRepository repository;
 
     @Transactional(readOnly = true)
-    public Page<MundusProgramListDTO> getAll(
-            boolean includeInactive,
-            Pageable pageable
-    ) {
-        Page<MundusProgramListDTO> page = includeInactive
-                ? repository.findAllList(pageable)
-                : repository.findActiveList(pageable);
+    public List<MundusProgramListDTO> getAll(boolean includeInactive) {
 
-        List<MundusProgramListDTO> programs = page.getContent();
+        List<MundusProgramListDTO> programs = includeInactive
+                ? repository.findAllList()
+                : repository.findActiveList();
 
         if (programs.isEmpty()) {
-            return page;
+            return programs;
         }
 
         List<Long> ids = programs.stream()
@@ -50,7 +46,7 @@ public class MundusProgramService {
         Map<Long, List<String>> countriesMap = new HashMap<>();
 
         for (Object[] row : countryRows) {
-            Long programId = (Long) row[0];
+            Long programId = ((Number) row[0]).longValue();
             String country = (String) row[1];
 
             countriesMap
@@ -67,9 +63,8 @@ public class MundusProgramService {
             );
         }
 
-        return page;
+        return programs;
     }
-
     @Transactional(readOnly = true)
     public MundusProgram getById(Long id) {
         MundusProgram program = repository.findById(id)

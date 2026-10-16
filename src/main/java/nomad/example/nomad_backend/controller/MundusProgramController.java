@@ -27,12 +27,11 @@ public class MundusProgramController {
 
 
     @GetMapping
-    public ResponseEntity<Page<MundusProgramListDTO>> getAll(
-            @RequestParam(defaultValue = "false") boolean includeInactive,
-            @PageableDefault(size = 20) Pageable pageable
+    public ResponseEntity<List<MundusProgramListDTO>> getAll(
+            @RequestParam(defaultValue = "false") boolean includeInactive
     ) {
         return ResponseEntity.ok(
-                mundusProgramService.getAll(includeInactive, pageable)
+                mundusProgramService.getAll(includeInactive)
         );
     }
 

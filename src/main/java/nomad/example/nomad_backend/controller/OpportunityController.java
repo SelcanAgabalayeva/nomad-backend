@@ -231,18 +231,22 @@ public class OpportunityController {
         opportunity.setVolunteeringType(request.getVolunteeringType());
         if (Boolean.TRUE.equals(request.getIsSendingOrganization())) {
 
-            if (request.getOrganizationId() != null) {
-                Organization organization = organizationRepository
-                        .findById(request.getOrganizationId())
-                        .orElseThrow(() ->
-                                new RuntimeException(
-                                        "Organization tapılmadı: "
-                                                + request.getOrganizationId()
-                                )
-                        );
-
-                opportunity.setOrganization(organization);
+            if (request.getOrganizationId() == null) {
+                throw new RuntimeException(
+                        "isSendingOrganization true olduqda organizationId vacibdir"
+                );
             }
+
+            Organization organization = organizationRepository
+                    .findById(request.getOrganizationId())
+                    .orElseThrow(() ->
+                            new RuntimeException(
+                                    "Organization tapılmadı: "
+                                            + request.getOrganizationId()
+                            )
+                    );
+
+            opportunity.setOrganization(organization);
 
         } else if (Boolean.FALSE.equals(request.getIsSendingOrganization())) {
 

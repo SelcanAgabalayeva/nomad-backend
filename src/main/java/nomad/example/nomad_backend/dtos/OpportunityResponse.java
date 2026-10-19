@@ -36,4 +36,5 @@ public class OpportunityResponse {
     private String volunteeringType;
     private OpportunityScope scope;
     private String description;
+    private Boolean isSendingOrganization;
 }

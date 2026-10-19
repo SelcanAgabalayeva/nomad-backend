@@ -106,6 +106,9 @@ public class OpportunityController {
                             .applyLink(opportunity.getApplyLink())
                             .scope(opportunity.getScope())
                             .description(opportunity.getSumAz())
+                            .isSendingOrganization(
+                                    opportunity.getOrganization() != null
+                            )
                             .build();
                 })
                 .toList();
@@ -182,6 +185,7 @@ public class OpportunityController {
                 .applyLink(saved.getApplyLink())
                 .volunteeringType(saved.getVolunteeringType())
                 .scope(saved.getScope())
+                .isSendingOrganization(saved.getOrganization() != null)
                 .build();
     }
 
@@ -249,6 +253,7 @@ public class OpportunityController {
                 .applyLink(saved.getApplyLink())
                 .volunteeringType(saved.getVolunteeringType())
                 .scope(saved.getScope())
+                .isSendingOrganization(saved.getOrganization() != null)
                 .build();
     }
     @DeleteMapping("/{id}")

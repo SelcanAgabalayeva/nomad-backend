@@ -40,4 +40,5 @@ public class OpportunityRequest {
     private OpportunityScope scope;
 
     private Long organizationId;
+    private Boolean isSendingOrganization;
 }

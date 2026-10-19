@@ -229,7 +229,25 @@ public class OpportunityController {
         opportunity.setFinancialSupport(request.getFinancialSupport());
         opportunity.setAgeRequirement(request.getAgeRequirement());
         opportunity.setVolunteeringType(request.getVolunteeringType());
+        if (Boolean.TRUE.equals(request.getIsSendingOrganization())) {
 
+            if (request.getOrganizationId() != null) {
+                Organization organization = organizationRepository
+                        .findById(request.getOrganizationId())
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Organization tapılmadı: "
+                                                + request.getOrganizationId()
+                                )
+                        );
+
+                opportunity.setOrganization(organization);
+            }
+
+        } else if (Boolean.FALSE.equals(request.getIsSendingOrganization())) {
+
+            opportunity.setOrganization(null);
+        }
         Opportunity saved = repository.save(opportunity);
 
         return OpportunityResponse.builder()

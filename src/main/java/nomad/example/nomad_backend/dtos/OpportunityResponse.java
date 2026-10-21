@@ -37,4 +37,5 @@ public class OpportunityResponse {
     private OpportunityScope scope;
     private String description;
     private Boolean isSendingOrganization;
+
 }

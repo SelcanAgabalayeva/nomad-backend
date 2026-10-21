@@ -344,6 +344,9 @@ public class OpportunityController {
                             .description(opportunity.getSumAz())
                             .category(opportunity.getCategory())
                             .applyLink(opportunity.getApplyLink())
+                            .isSendingOrganization(
+                                    Boolean.TRUE.equals(opportunity.getIsSendingOrganization())
+                            )
                             .build();
                 });
     }

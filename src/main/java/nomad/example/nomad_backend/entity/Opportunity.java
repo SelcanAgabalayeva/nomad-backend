@@ -88,7 +88,8 @@ public class Opportunity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id")
     private Organization organization;
-    @Column(nullable = false)
+    @Column(name = "is_sending_organization", nullable = false)
+    @Builder.Default
     private Boolean isSendingOrganization = false;
 }
 
